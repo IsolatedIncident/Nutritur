@@ -4,8 +4,6 @@
 
   // ---------- Storage keys ----------
   const STORAGE_TALLY  = "macro_tally_v2";
-  const STORAGE_MACROS = "macro_history_v1";
-  const STORAGE_WEIGHT = "weight_history_v1";
 
   // ---------- Calculator DOM ----------
   const foodSelect    = document.getElementById("foodSelect");
@@ -30,36 +28,31 @@
   const tFat     = document.getElementById("tFat");
   const tCarbs   = document.getElementById("tCarbs");
 
-  // ---------- History DOM ----------
-  const saveDayBtn   = document.getElementById("saveDayBtn");
-  const saveDayDate  = document.getElementById("saveDayDate");
-  const saveDayMsg   = document.getElementById("saveDayMsg");
+  // ---------- Storage ----------
+    const STORAGE_HISTORY = "history_v1";
 
-  const weightDate   = document.getElementById("weightDate");
-  const weightInput  = document.getElementById("weightInput");
-  const saveWeightBtn= document.getElementById("saveWeightBtn");
-  const saveWeightMsg= document.getElementById("saveWeightMsg");
+    // ---------- History DOM ----------
+    const saveDayBtn   = document.getElementById("saveDayBtn");
+    const saveDayDate  = document.getElementById("saveDayDate");
+    const saveDayMsg   = document.getElementById("saveDayMsg");
 
-  const exportMacrosBtn  = document.getElementById("exportMacrosBtn");
-  const exportWeightsBtn = document.getElementById("exportWeightsBtn");
-  const importMacrosFile = document.getElementById("importMacrosFile");
-  const importWeightsFile= document.getElementById("importWeightsFile");
+    const weightDate   = document.getElementById("weightDate");
+    const weightInput  = document.getElementById("weightInput");
+    const saveWeightBtn= document.getElementById("saveWeightBtn");
+    const saveWeightMsg= document.getElementById("saveWeightMsg");
 
-  const macroStart = document.getElementById("macroStart");
-  const macroEnd   = document.getElementById("macroEnd");
-  const macroRangeApply = document.getElementById("macroRangeApply");
+    const exportHistoryBtn  = document.getElementById("exportHistoryBtn");
+    const importHistoryFile = document.getElementById("importHistoryFile");
 
-  const weightStart = document.getElementById("weightStart");
-  const weightEnd   = document.getElementById("weightEnd");
-  const weightRangeApply = document.getElementById("weightRangeApply");
+    const historyStart = document.getElementById("historyStart");
+    const historyEnd   = document.getElementById("historyEnd");
+    const historyRangeApply = document.getElementById("historyRangeApply");
 
-  const macroCanvas  = document.getElementById("macroChart");
-  const weightCanvas = document.getElementById("weightChart");
+    const historyCanvas = document.getElementById("historyChart");
 
-  // ---------- State ----------
-  let log = loadJSON(STORAGE_TALLY, []);
-  let macroHistory = loadJSON(STORAGE_MACROS, []);
-  let weightHistory = loadJSON(STORAGE_WEIGHT, []);
+    // ---------- State ----------
+    let history = loadJSON_any(STORAGE_HISTORY, []);  // array of entries
+
 
   // ---------- Utils ----------
   function todayISO() {
@@ -84,18 +77,32 @@
   const fmt0 = (n) => fmt(n, 0);
   const fmt1 = (n) => fmt(n, 1);
 
+  function filterByRange(entries, startISO, endISO) {
+    const start = startISO ? parseISODate(startISO) : null;
+    const end = endISO ? parseISODate(endISO) : null;
+    return entries.filter(e => {
+        const d = parseISODate(e.date);
+        if (!d) return false;
+        if (start && d < start) return false;
+        if (end && d > end) return false;
+        return true;
+    });
+    }
+
   function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
 
-  function loadJSON(key, fallback) {
+  function loadJSON_any(key, fallback) {
     try {
-      const raw = localStorage.getItem(key);
-      if (!raw) return fallback;
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : fallback;
-    } catch {
-      return fallback;
+        const raw = localStorage.getItem(key);
+        if (!raw) return fallback;
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : fallback;
+    } catch { return fallback; }
     }
-  }
+  function saveJSON_any(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+    }
+
 
   function saveJSON(key, value) {
     try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
@@ -112,6 +119,11 @@
     a.remove();
     URL.revokeObjectURL(url);
   }
+
+  function round(n, decimals) {
+    const p = Math.pow(10, decimals);
+    return Math.round((Number(n) || 0) * p) / p;
+    }
 
   // ---------- Food / measure helpers ----------
   function getSelectedFood() {
@@ -204,6 +216,7 @@
     }
   }
 
+
   // ---------- Calculator logic ----------
   function computeEntryPreview() {
     const food = getSelectedFood();
@@ -248,6 +261,29 @@
       totals
     };
   }
+
+  function computeRatios(entry) {
+    const p = Number(entry.protein) || 0;
+    const c = Number(entry.carbs) || 0;
+    const f = Number(entry.fat) || 0;
+
+    const pCal = p * 4;
+    const cCal = c * 4;
+    const fCal = f * 9;
+    const total = pCal + cCal + fCal;
+
+    if (total <= 0) {
+        entry.protein_ratio = 0;
+        entry.carb_ratio = 0;
+        entry.fat_ratio = 0;
+        return entry;
+    }
+
+    entry.protein_ratio = round(pCal / total, 4);
+    entry.carb_ratio    = round(cCal / total, 4);
+    entry.fat_ratio     = round(fCal / total, 4);
+    return entry;
+    }
 
   function addToLog() {
     const entry = computeEntryPreview();
@@ -358,279 +394,219 @@
     const date = saveDayDate.value || todayISO();
     const totals = currentTallyTotals();
 
-    const entry = {
-      date,
-      calories: Number(fmt0(totals.kcal)),
-      protein: Number(fmt1(totals.protein)),
-      fat: Number(fmt1(totals.fat)),
-      carbs: Number(fmt1(totals.carbs))
-    };
+    // Find existing entry for date or create new
+    const existing = history.find(e => e.date === date) || { date };
 
-    macroHistory = upsertByDate(macroHistory, entry);
-    saveJSON(STORAGE_MACROS, macroHistory);
+    existing.calories = Number(Math.round(totals.kcal || 0));
+    existing.protein  = round(totals.protein || 0, 1);
+    existing.fat      = round(totals.fat || 0, 1);
+    existing.carbs    = round(totals.carbs || 0, 1);
 
-    // “Save to file” = download JSON
-    downloadJSON("macro_history.json", macroHistory);
+    computeRatios(existing);
 
-    saveDayMsg.textContent = `Saved ${date} and downloaded macro_history.json`;
-    redrawAllCharts();
-  }
+    history = upsertByDate(history, existing);
+    saveJSON_any(STORAGE_HISTORY, history);
+
+    downloadJSON("history.json", history);
+    saveDayMsg.textContent = `Saved ${date} + downloaded history.json`;
+
+    setDefaultHistoryRange();
+    redrawHistoryChart();
+    }
 
   function saveWeight() {
     const date = weightDate.value || todayISO();
     const w = Number(weightInput.value);
 
     if (!Number.isFinite(w) || w <= 0) {
-      saveWeightMsg.textContent = "Enter a valid weight first.";
-      return;
+        saveWeightMsg.textContent = "Enter a valid weight first.";
+        return;
     }
 
-    const entry = { date, weight: Number(fmt1(w)) };
-    weightHistory = upsertByDate(weightHistory, entry);
-    saveJSON(STORAGE_WEIGHT, weightHistory);
+    const existing = history.find(e => e.date === date) || { date };
+    existing.weight = round(w, 1);
 
-    downloadJSON("weight_history.json", weightHistory);
+    // If macros exist, keep ratios updated too
+    computeRatios(existing);
 
-    saveWeightMsg.textContent = `Saved ${date} and downloaded weight_history.json`;
-    redrawAllCharts();
-  }
+    history = upsertByDate(history, existing);
+    saveJSON_any(STORAGE_HISTORY, history);
+
+    downloadJSON("history.json", history);
+    saveWeightMsg.textContent = `Saved ${date} + downloaded history.json`;
+
+    setDefaultHistoryRange();
+    redrawHistoryChart();
+    }
+
 
   // ---------- Import JSON ----------
-  async function importJSONFile(file) {
-    const text = await file.text();
-    return JSON.parse(text);
-  }
 
-  async function handleImportMacros(ev) {
+  exportHistoryBtn.addEventListener("click", () => downloadJSON("history.json", history));
+
+  importHistoryFile.addEventListener("change", async (ev) => {
     const file = ev.target.files?.[0];
     if (!file) return;
     try {
-      const data = await importJSONFile(file);
-      if (!Array.isArray(data)) throw new Error("macro_history.json must be an array");
+        const text = await file.text();
+        const data = JSON.parse(text);
+        if (!Array.isArray(data)) throw new Error("history.json must be an array");
 
-      // basic shape check
-      const cleaned = data
+        // Clean + normalize
+        history = data
         .filter(e => e && typeof e.date === "string")
-        .map(e => ({
-          date: e.date,
-          calories: Number(e.calories ?? 0),
-          protein: Number(e.protein ?? 0),
-          fat: Number(e.fat ?? 0),
-          carbs: Number(e.carbs ?? 0),
-        }))
-        .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+        .map(e => {
+            const entry = {
+            date: e.date,
+            calories: Number(e.calories ?? 0),
+            protein: Number(e.protein ?? 0),
+            fat: Number(e.fat ?? 0),
+            carbs: Number(e.carbs ?? 0),
+            weight: (e.weight === undefined || e.weight === null) ? undefined : Number(e.weight),
+            protein_ratio: Number(e.protein_ratio ?? 0),
+            carb_ratio: Number(e.carb_ratio ?? 0),
+            fat_ratio: Number(e.fat_ratio ?? 0),
+            };
+            // recompute ratios if macros exist
+            if ((entry.protein || entry.fat || entry.carbs) && !(e.protein_ratio || e.carb_ratio || e.fat_ratio)) {
+            computeRatios(entry);
+            }
+            // round nicely
+            entry.calories = Math.round(entry.calories || 0);
+            entry.protein  = round(entry.protein, 1);
+            entry.fat      = round(entry.fat, 1);
+            entry.carbs    = round(entry.carbs, 1);
+            if (entry.weight !== undefined) entry.weight = round(entry.weight, 1);
+            entry.protein_ratio = round(entry.protein_ratio, 4);
+            entry.carb_ratio    = round(entry.carb_ratio, 4);
+            entry.fat_ratio     = round(entry.fat_ratio, 4);
+            return entry;
+        })
+        .sort((a, b) => a.date.localeCompare(b.date));
 
-      macroHistory = cleaned;
-      saveJSON(STORAGE_MACROS, macroHistory);
-      redrawAllCharts();
+        saveJSON_any(STORAGE_HISTORY, history);
+        setDefaultHistoryRange();
+        redrawHistoryChart();
     } catch (err) {
-      alert(`Failed to load macro history: ${err.message}`);
+        alert(`Failed to load history: ${err.message}`);
     } finally {
-      ev.target.value = "";
+        ev.target.value = "";
     }
-  }
+    });
 
-  async function handleImportWeights(ev) {
-    const file = ev.target.files?.[0];
-    if (!file) return;
-    try {
-      const data = await importJSONFile(file);
-      if (!Array.isArray(data)) throw new Error("weight_history.json must be an array");
-
-      const cleaned = data
-        .filter(e => e && typeof e.date === "string")
-        .map(e => ({
-          date: e.date,
-          weight: Number(e.weight ?? 0),
-        }))
-        .sort((a, b) => String(a.date).localeCompare(String(b.date)));
-
-      weightHistory = cleaned;
-      saveJSON(STORAGE_WEIGHT, weightHistory);
-      redrawAllCharts();
-    } catch (err) {
-      alert(`Failed to load weight history: ${err.message}`);
-    } finally {
-      ev.target.value = "";
-    }
-  }
 
   // ---------- Charting (Chart.js) ----------
-    let macroChart = null;
-    let weightChart = null;
+    let historyChart = null;
 
-    function ensureCharts() {
+    function ensureHistoryChart() {
     if (!window.Chart) {
         alert("Chart.js not found. Make sure chart.umd.js is loaded before app.js.");
         return false;
     }
 
-    if (!macroChart) {
-        const ctx = macroCanvas.getContext("2d");
-        macroChart = new Chart(ctx, {
+    if (historyChart) return true;
+
+    const ctx = historyCanvas.getContext("2d");
+    historyChart = new Chart(ctx, {
         type: "line",
         data: {
-            labels: [],
-            datasets: [
-            {
-                label: "Calories",
-                data: [],
-                yAxisID: "yKcal",
-                borderColor: "#5aa9ff",
-                backgroundColor: "transparent",
-                pointRadius: 2,
-                tension: 0.25,
-            },
-            {
-                label: "Protein (g)",
-                data: [],
-                yAxisID: "yG",
-                borderColor: "#7CFF6B",
-                backgroundColor: "transparent",
-                pointRadius: 2,
-                tension: 0.25,
-            },
-            {
-                label: "Fat (g)",
-                data: [],
-                yAxisID: "yG",
-                borderColor: "#FFB84D",
-                backgroundColor: "transparent",
-                pointRadius: 2,
-                tension: 0.25,
-            },
-            {
-                label: "Carbs (g)",
-                data: [],
-                yAxisID: "yG",
-                borderColor: "#FF6BD6",
-                backgroundColor: "transparent",
-                pointRadius: 2,
-                tension: 0.25,
-            },
-            ],
+        labels: [],
+        datasets: [
+            { key: "calories",       label: "Calories",       yAxisID: "yKcal", borderColor: "#5aa9ff", backgroundColor: "transparent", pointRadius: 2, tension: 0.25, data: [] },
+
+            { key: "protein",        label: "Protein (g)",    yAxisID: "yG",    borderColor: "#7CFF6B", backgroundColor: "transparent", pointRadius: 2, tension: 0.25, data: [] },
+            { key: "fat",            label: "Fat (g)",        yAxisID: "yG",    borderColor: "#FFB84D", backgroundColor: "transparent", pointRadius: 2, tension: 0.25, data: [] },
+            { key: "carbs",          label: "Carbs (g)",      yAxisID: "yG",    borderColor: "#FF6BD6", backgroundColor: "transparent", pointRadius: 2, tension: 0.25, data: [] },
+
+            { key: "weight",         label: "Weight",        yAxisID: "yW",    borderColor: "#A78BFA", backgroundColor: "transparent", pointRadius: 2, tension: 0.25, data: [] },
+
+            { key: "protein_ratio",  label: "Protein Ratio", yAxisID: "yR",    borderColor: "#34D399", backgroundColor: "transparent", pointRadius: 2, tension: 0.25, data: [] },
+            { key: "fat_ratio",      label: "Fat Ratio",     yAxisID: "yR",    borderColor: "#FBBF24", backgroundColor: "transparent", pointRadius: 2, tension: 0.25, data: [] },
+            { key: "carb_ratio",     label: "Carb Ratio",    yAxisID: "yR",    borderColor: "#F472B6", backgroundColor: "transparent", pointRadius: 2, tension: 0.25, data: [] },
+        ],
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: { mode: "index", intersect: false },
-            plugins: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
+        plugins: {
             legend: { labels: { color: "#e7e9ee" } },
-            tooltip: { enabled: true },
-            },
-            scales: {
+            tooltip: { enabled: true }
+        },
+        scales: {
             x: {
-                ticks: { color: "#a7adbb", maxRotation: 0, autoSkip: true },
-                grid: { color: "rgba(255,255,255,0.06)" },
+            ticks: { color: "#a7adbb", maxRotation: 0, autoSkip: true },
+            grid: { color: "rgba(255,255,255,0.06)" },
             },
             yKcal: {
-                position: "left",
-                title: { display: true, text: "Calories (kcal)", color: "#a7adbb" },
-                ticks: { color: "#a7adbb" },
-                grid: { color: "rgba(255,255,255,0.06)" },
+            position: "left",
+            title: { display: true, text: "Calories (kcal)", color: "#a7adbb" },
+            ticks: { color: "#a7adbb" },
+            grid: { color: "rgba(255,255,255,0.06)" },
             },
             yG: {
-                position: "right",
-                title: { display: true, text: "Macros (g)", color: "#a7adbb" },
-                ticks: { color: "#a7adbb" },
-                grid: { drawOnChartArea: false },
+            position: "right",
+            title: { display: true, text: "Macros (g)", color: "#a7adbb" },
+            ticks: { color: "#a7adbb" },
+            grid: { drawOnChartArea: false },
             },
+            yW: {
+            position: "right",
+            offset: true,
+            title: { display: true, text: "Weight", color: "#a7adbb" },
+            ticks: { color: "#a7adbb" },
+            grid: { drawOnChartArea: false },
             },
-        },
-        });
-    }
-
-    if (!weightChart) {
-        const ctx = weightCanvas.getContext("2d");
-        weightChart = new Chart(ctx, {
-        type: "line",
-        data: {
-            labels: [],
-            datasets: [
-            {
-                label: "Weight",
-                data: [],
-                borderColor: "#5aa9ff",
-                backgroundColor: "transparent",
-                pointRadius: 2,
-                tension: 0.25,
-            },
-            ],
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: { mode: "index", intersect: false },
-            plugins: {
-            legend: { labels: { color: "#e7e9ee" } },
-            },
-            scales: {
-            x: {
-                ticks: { color: "#a7adbb", maxRotation: 0, autoSkip: true },
-                grid: { color: "rgba(255,255,255,0.06)" },
-            },
-            y: {
-                title: { display: true, text: "Weight", color: "#a7adbb" },
-                ticks: { color: "#a7adbb" },
-                grid: { color: "rgba(255,255,255,0.06)" },
-            },
-            },
-        },
-        });
-    }
+            yR: {
+            position: "left",
+            offset: true,
+            min: 0,
+            max: 1,
+            title: { display: true, text: "Ratio", color: "#a7adbb" },
+            ticks: { color: "#a7adbb" },
+            grid: { drawOnChartArea: false },
+            }
+        }
+        }
+    });
 
     return true;
     }
 
-    function filterByRange(entries, startISO, endISO) {
-    const start = startISO ? parseISODate(startISO) : null;
-    const end = endISO ? parseISODate(endISO) : null;
-
-    return entries.filter(e => {
-        const d = parseISODate(e.date);
-        if (!d) return false;
-        if (start && d < start) return false;
-        if (end && d > end) return false;
-        return true;
-    });
+    function setDefaultHistoryRange() {
+    const dates = history.map(e => e.date).sort();
+    if (dates.length) {
+        historyStart.value = dates[0];
+        historyEnd.value = dates[dates.length - 1];
+    } else {
+        historyStart.value = "";
+        historyEnd.value = "";
+    }
     }
 
-    function updateMacroChart(macros) {
-    const labels = macros.map(e => e.date);
+    function redrawHistoryChart() {
+    if (!ensureHistoryChart()) return;
 
-    macroChart.data.labels = labels;
-    macroChart.data.datasets[0].data = macros.map(e => Number(e.calories) || 0);
-    macroChart.data.datasets[1].data = macros.map(e => Number(e.protein) || 0);
-    macroChart.data.datasets[2].data = macros.map(e => Number(e.fat) || 0);
-    macroChart.data.datasets[3].data = macros.map(e => Number(e.carbs) || 0);
+    const start = historyStart.value || null;
+    const end = historyEnd.value || null;
 
-    macroChart.update();
+    const rows = filterByRange(history, start, end).sort((a,b) => a.date.localeCompare(b.date));
+    const labels = rows.map(r => r.date);
+
+    historyChart.data.labels = labels;
+
+    // Fill datasets by key
+    for (const ds of historyChart.data.datasets) {
+        ds.data = rows.map(r => {
+        const v = r[ds.key];
+        return (v === undefined || v === null) ? null : Number(v);
+        });
+    }
+    historyChart.update();
     }
 
-    function updateWeightChart(weights) {
-    const labels = weights.map(e => e.date);
-
-    weightChart.data.labels = labels;
-    weightChart.data.datasets[0].data = weights.map(e => Number(e.weight) || 0);
-
-    weightChart.update();
-    }
-
-    function redrawAllCharts() {
-    if (!ensureCharts()) return;
-
-    const mStart = macroStart.value || null;
-    const mEnd = macroEnd.value || null;
-    const wStart = weightStart.value || null;
-    const wEnd = weightEnd.value || null;
-
-    const macros = filterByRange(macroHistory, mStart, mEnd).sort((a, b) => a.date.localeCompare(b.date));
-    const weights = filterByRange(weightHistory, wStart, wEnd).sort((a, b) => a.date.localeCompare(b.date));
-
-    updateMacroChart(macros);
-    updateWeightChart(weights);
-    }
-
+    historyRangeApply.addEventListener("click", () => redrawHistoryChart());
+    window.addEventListener("resize", () => redrawHistoryChart());
 
   // ---------- Events ----------
   foodSelect.addEventListener("change", () => {
@@ -680,4 +656,12 @@
 
   setDefaultDateRanges();
   redrawAllCharts();
+
+  setDefaultHistoryRange();
+  ensureHistoryChart();
+  redrawHistoryChart();  
+
+  saveDayBtn.addEventListener("click", saveDay);
+  saveWeightBtn.addEventListener("click", saveWeight);
+
 })();

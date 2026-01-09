@@ -101,9 +101,7 @@ window.FOODS = [
         { id: "g", label: "grams (g)", kind: "g", basePerMeasure: 1 },
         { id: "bun", label: "bun (53 g)", kind: "unit", basePerMeasure: 53 }
     ]
-    },
-
-
+    }
 ];
 
 // Tip for nutrition labels:

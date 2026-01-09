@@ -8,109 +8,67 @@
 </head>
 <body>
 
-  <!-- HISTORY CARD -->
-  <div class="card">
-    <div class="headerRow">
-      <h1>History</h1>
-      <div class="headerActions">
-        <button id="exportMacrosBtn" class="secondary small">Export macro_history.json</button>
-        <button id="exportWeightsBtn" class="secondary small">Export weight_history.json</button>
-      </div>
+
+  <div class="headerRow">
+    <h1>History</h1>
+    <div class="headerActions">
+        
+    </div>
     </div>
 
-    <div class="twoCol">
-      <div class="panel">
-        <h2>Save Day</h2>
+    <div class="panel">
         <div class="row">
-          <label for="saveDayDate">Date</label>
-          <input id="saveDayDate" type="date" />
-        </div>
-        <button id="saveDayBtn">Save Day (from Today’s Tally)</button>
-        <div class="hint subtle" id="saveDayMsg"></div>
+        
+        <h2>Import History</h2><input id="importHistoryFile" type="file" accept="application/json,.json">
+        <button id="exportHistoryBtn" class="secondary small">Export history.json</button></div>
+        <div class="row">
+        <h2>Save Day</h2><label for="saveDayDate">Date</label>
+        <input id="saveDayDate" type="date">
+        <button id="saveDayBtn">Save Day (from Today’s Tally)</button><div class="hint subtle" id="saveDayMsg"></div></div>
+        
+        
 
         <div class="spacer"></div>
 
-        <h2>Weight Tracker</h2>
+        
         <div class="row">
-          <label for="weightDate">Date</label>
-          <input id="weightDate" type="date" />
-        </div>
-        <div class="row">
-          <label for="weightInput">Weight</label>
-          <input id="weightInput" type="number" inputmode="decimal" step="0.1" placeholder="e.g. 185.4" />
-        </div>
-        <button id="saveWeightBtn">Save Weight</button>
-        <div class="hint subtle" id="saveWeightMsg"></div>
-      </div>
+        <h2>Weight Tracker</h2><label for="weightDate">Date</label>
+        <input id="weightDate" type="date">
+        <button id="saveWeightBtn">Save Weight</button><div class="hint subtle" id="saveWeightMsg"></div></div>
+        
+        
+        
+    <div class="row">
+        <label for="weightInput">Weight</label>
+        <input id="weightInput" type="number" inputmode="decimal" step="0.1" placeholder="e.g. 203.0">
+        </div></div>
 
-      <div class="panel">
-        <h2>Import / Load JSON</h2>
+    
 
-        <div class="row">
-          <label>Load macro_history.json</label>
-          <input id="importMacrosFile" type="file" accept="application/json,.json" />
-        </div>
 
-        <div class="row">
-          <label>Load weight_history.json</label>
-          <input id="importWeightsFile" type="file" accept="application/json,.json" />
-        </div>
 
-        <div class="hint subtle">
-          Tip: “Save Day” / “Save Weight” will download JSON files. Later you can re-load them here.
-        </div>
-      </div>
-    </div>
-
-    <div class="chartSection">
-      <div class="chartHeader">
-        <h2>Macro Trend</h2>
+  <div class="chartSection">
+    <div class="chartHeader">
+        <h2>Trend</h2>
         <div class="rangeControls">
-          <div class="row inline">
-            <label for="macroStart">Start</label>
-            <input id="macroStart" type="date" />
-          </div>
-          <div class="row inline">
-            <label for="macroEnd">End</label>
-            <input id="macroEnd" type="date" />
-          </div>
-          <button id="macroRangeApply" class="secondary small">Apply</button>
+        <div class="row inline">
+            <label for="historyStart">Start</label>
+            <input id="historyStart" type="date">
         </div>
-      </div>
-
-      <div class="hint subtle">
-        Calories use the <strong>left</strong> axis (kcal). Protein/Fat/Carbs use the <strong>right</strong> axis (grams).
-      </div>
-
-      <div class="canvasWrap">
-        <canvas id="macroChart" width="900" height="320"></canvas>
-      </div>
+        <div class="row inline">
+            <label for="historyEnd">End</label>
+            <input id="historyEnd" type="date">
+        </div>
+        <button id="historyRangeApply" class="secondary small">Apply</button>
+        </div>
     </div>
 
-    <div class="chartSection">
-      <div class="chartHeader">
-        <h2>Weight Trend</h2>
-        <div class="rangeControls">
-          <div class="row inline">
-            <label for="weightStart">Start</label>
-            <input id="weightStart" type="date" />
-          </div>
-          <div class="row inline">
-            <label for="weightEnd">End</label>
-            <input id="weightEnd" type="date" />
-          </div>
-          <button id="weightRangeApply" class="secondary small">Apply</button>
-        </div>
-      </div>
-
-      <div class="canvasWrap">
-        <canvas id="weightChart" width="900" height="320"></canvas>
-      </div>
+    <div class="canvasWrap">
+        <canvas id="historyChart" style="display: block; box-sizing: border-box; height: 358px; width: 1815px;" width="1815" height="358"></canvas>
     </div>
-  </div>
+    </div><!-- MACRO CALCULATOR CARD -->
+  
 
-
-  <!-- MACRO CALCULATOR CARD -->
   <div class="card">
     <h1>Macro Calculator</h1>
 
@@ -126,14 +84,7 @@
 
     <div class="row">
       <label for="amountInput">Amount (<span id="unitLabel">g</span>)</label>
-      <input
-        id="amountInput"
-        type="number"
-        inputmode="decimal"
-        min="0"
-        step="0.1"
-        placeholder="Enter amount…"
-      />
+      <input id="amountInput" type="number" inputmode="decimal" min="0" step="0.1" placeholder="Enter amount…">
     </div>
 
     <div class="actions">
@@ -145,13 +96,13 @@
       <h2>This Entry</h2>
       <table>
         <tbody>
-          <tr><td>Calories</td><td><strong id="pKcal">0</strong> kcal</td></tr>
-          <tr><td>Protein</td><td><strong id="pProtein">0</strong> g</td></tr>
-          <tr><td>Fat</td><td><strong id="pFat">0</strong> g</td></tr>
-          <tr><td>Carbs</td><td><strong id="pCarbs">0</strong> g</td></tr>
+          <tr><td>Calories</td><td><strong id="pKcal">4</strong> kcal</td></tr>
+          <tr><td>Protein</td><td><strong id="pProtein">0.8</strong> g</td></tr>
+          <tr><td>Fat</td><td><strong id="pFat">0.0</strong> g</td></tr>
+          <tr><td>Carbs</td><td><strong id="pCarbs">0.1</strong> g</td></tr>
         </tbody>
       </table>
-      <div class="hint" id="perUnitHint"></div>
+      <div class="hint" id="perUnitHint">Per 1 g: 3.870968 kcal, 0.774194P, 0.048387F, 0.129032C. (1.0 g total)</div>
     </div>
 
     <div class="log">
@@ -173,15 +124,17 @@
               <th></th>
             </tr>
           </thead>
-          <tbody id="logBody"></tbody>
+          <tbody id="logBody"><tr><td colspan="7" style="color: var(--muted); padding: 14px 10px;">
+        No items yet — add something above.
+      </td></tr></tbody>
           <tfoot>
             <tr>
               <td><strong>Total</strong></td>
               <td></td>
               <td class="num"><strong id="tKcal">0</strong></td>
-              <td class="num"><strong id="tProtein">0</strong></td>
-              <td class="num"><strong id="tFat">0</strong></td>
-              <td class="num"><strong id="tCarbs">0</strong></td>
+              <td class="num"><strong id="tProtein">0.0</strong></td>
+              <td class="num"><strong id="tFat">0.0</strong></td>
+              <td class="num"><strong id="tCarbs">0.0</strong></td>
               <td></td>
             </tr>
           </tfoot>
@@ -196,11 +149,12 @@
     <p class="footer">
       Edit <code>foods.js</code> to add/adjust foods/measures.
     </p>
-  </div>
-
-  <script src="./foods.js"></script>
+  </div><script src="./foods.js"></script>
   <!-- Chart.js from node_modules (UMD build) -->
   <script src="./node_modules/chart.js/dist/chart.umd.js"></script>
   <script src="./app.js"></script>
+
+
+
 </body>
 </html>
