@@ -455,323 +455,182 @@
     }
   }
 
-  // ---------- Charting (canvas, no libs) ----------
-  function setCanvasHiDPI(canvas) {
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    const w = Math.max(300, Math.floor(rect.width));
-    const h = Math.max(200, Math.floor(rect.height));
-    canvas.width = Math.floor(w * dpr);
-    canvas.height = Math.floor(h * dpr);
-    const ctx = canvas.getContext("2d");
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    return ctx;
-  }
+  // ---------- Charting (Chart.js) ----------
+    let macroChart = null;
+    let weightChart = null;
 
-  function niceMax(v) {
-    if (!Number.isFinite(v) || v <= 0) return 10;
-    const pow = Math.pow(10, Math.floor(Math.log10(v)));
-    const n = v / pow;
-    const rounded = n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10;
-    return rounded * pow;
-  }
+    function ensureCharts() {
+    if (!window.Chart) {
+        alert("Chart.js not found. Make sure chart.umd.js is loaded before app.js.");
+        return false;
+    }
 
-  function filterByRange(entries, startISO, endISO) {
+    if (!macroChart) {
+        const ctx = macroCanvas.getContext("2d");
+        macroChart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: [],
+            datasets: [
+            {
+                label: "Calories",
+                data: [],
+                yAxisID: "yKcal",
+                borderColor: "#5aa9ff",
+                backgroundColor: "transparent",
+                pointRadius: 2,
+                tension: 0.25,
+            },
+            {
+                label: "Protein (g)",
+                data: [],
+                yAxisID: "yG",
+                borderColor: "#7CFF6B",
+                backgroundColor: "transparent",
+                pointRadius: 2,
+                tension: 0.25,
+            },
+            {
+                label: "Fat (g)",
+                data: [],
+                yAxisID: "yG",
+                borderColor: "#FFB84D",
+                backgroundColor: "transparent",
+                pointRadius: 2,
+                tension: 0.25,
+            },
+            {
+                label: "Carbs (g)",
+                data: [],
+                yAxisID: "yG",
+                borderColor: "#FF6BD6",
+                backgroundColor: "transparent",
+                pointRadius: 2,
+                tension: 0.25,
+            },
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: "index", intersect: false },
+            plugins: {
+            legend: { labels: { color: "#e7e9ee" } },
+            tooltip: { enabled: true },
+            },
+            scales: {
+            x: {
+                ticks: { color: "#a7adbb", maxRotation: 0, autoSkip: true },
+                grid: { color: "rgba(255,255,255,0.06)" },
+            },
+            yKcal: {
+                position: "left",
+                title: { display: true, text: "Calories (kcal)", color: "#a7adbb" },
+                ticks: { color: "#a7adbb" },
+                grid: { color: "rgba(255,255,255,0.06)" },
+            },
+            yG: {
+                position: "right",
+                title: { display: true, text: "Macros (g)", color: "#a7adbb" },
+                ticks: { color: "#a7adbb" },
+                grid: { drawOnChartArea: false },
+            },
+            },
+        },
+        });
+    }
+
+    if (!weightChart) {
+        const ctx = weightCanvas.getContext("2d");
+        weightChart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: [],
+            datasets: [
+            {
+                label: "Weight",
+                data: [],
+                borderColor: "#5aa9ff",
+                backgroundColor: "transparent",
+                pointRadius: 2,
+                tension: 0.25,
+            },
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: "index", intersect: false },
+            plugins: {
+            legend: { labels: { color: "#e7e9ee" } },
+            },
+            scales: {
+            x: {
+                ticks: { color: "#a7adbb", maxRotation: 0, autoSkip: true },
+                grid: { color: "rgba(255,255,255,0.06)" },
+            },
+            y: {
+                title: { display: true, text: "Weight", color: "#a7adbb" },
+                ticks: { color: "#a7adbb" },
+                grid: { color: "rgba(255,255,255,0.06)" },
+            },
+            },
+        },
+        });
+    }
+
+    return true;
+    }
+
+    function filterByRange(entries, startISO, endISO) {
     const start = startISO ? parseISODate(startISO) : null;
     const end = endISO ? parseISODate(endISO) : null;
 
     return entries.filter(e => {
-      const d = parseISODate(e.date);
-      if (!d) return false;
-      if (start && d < start) return false;
-      if (end && d > end) return false;
-      return true;
+        const d = parseISODate(e.date);
+        if (!d) return false;
+        if (start && d < start) return false;
+        if (end && d > end) return false;
+        return true;
     });
-  }
-
-  function drawMultiAxisLineChart(canvas, title, seriesLeft, seriesRight) {
-    const ctx = setCanvasHiDPI(canvas);
-    const rect = canvas.getBoundingClientRect();
-    const W = rect.width;
-    const H = rect.height;
-
-    ctx.clearRect(0, 0, W, H);
-
-    // Layout
-    const padL = 56;
-    const padR = 56;
-    const padT = 28;
-    const padB = 36;
-    const plotW = W - padL - padR;
-    const plotH = H - padT - padB;
-
-    // Collect x labels from whichever series has data
-    const allPoints = [...seriesLeft, ...seriesRight].flatMap(s => s.points);
-    if (allPoints.length === 0) {
-      ctx.fillStyle = "#a7adbb";
-      ctx.font = "14px system-ui";
-      ctx.fillText("No data in range.", padL, padT + 24);
-      return;
     }
 
-    // Sort unique dates
-    const dates = Array.from(new Set(allPoints.map(p => p.date))).sort();
-    const xFor = (date) => {
-      const i = dates.indexOf(date);
-      if (dates.length <= 1) return padL + plotW / 2;
-      return padL + (i / (dates.length - 1)) * plotW;
-    };
+    function updateMacroChart(macros) {
+    const labels = macros.map(e => e.date);
 
-    // Y scaling
-    const leftMaxRaw = Math.max(1, ...seriesLeft.flatMap(s => s.points.map(p => p.value)));
-    const rightMaxRaw = Math.max(1, ...seriesRight.flatMap(s => s.points.map(p => p.value)));
+    macroChart.data.labels = labels;
+    macroChart.data.datasets[0].data = macros.map(e => Number(e.calories) || 0);
+    macroChart.data.datasets[1].data = macros.map(e => Number(e.protein) || 0);
+    macroChart.data.datasets[2].data = macros.map(e => Number(e.fat) || 0);
+    macroChart.data.datasets[3].data = macros.map(e => Number(e.carbs) || 0);
 
-    const leftMax = niceMax(leftMaxRaw * 1.08);
-    const rightMax = niceMax(rightMaxRaw * 1.08);
-
-    const yLeft = (v) => padT + plotH - (clamp(v, 0, leftMax) / leftMax) * plotH;
-    const yRight = (v) => padT + plotH - (clamp(v, 0, rightMax) / rightMax) * plotH;
-
-    // Title
-    ctx.fillStyle = "#e7e9ee";
-    ctx.font = "600 14px system-ui";
-    ctx.fillText(title, padL, 18);
-
-    // Grid
-    ctx.strokeStyle = "rgba(255,255,255,0.08)";
-    ctx.lineWidth = 1;
-    const gridLines = 5;
-    for (let i = 0; i <= gridLines; i++) {
-      const y = padT + (i / gridLines) * plotH;
-      ctx.beginPath();
-      ctx.moveTo(padL, y);
-      ctx.lineTo(padL + plotW, y);
-      ctx.stroke();
+    macroChart.update();
     }
 
-    // Axes
-    ctx.strokeStyle = "rgba(255,255,255,0.18)";
-    ctx.beginPath();
-    ctx.moveTo(padL, padT);
-    ctx.lineTo(padL, padT + plotH);
-    ctx.lineTo(padL + plotW, padT + plotH);
-    ctx.stroke();
+    function updateWeightChart(weights) {
+    const labels = weights.map(e => e.date);
 
-    ctx.beginPath();
-    ctx.moveTo(padL + plotW, padT);
-    ctx.lineTo(padL + plotW, padT + plotH);
-    ctx.stroke();
+    weightChart.data.labels = labels;
+    weightChart.data.datasets[0].data = weights.map(e => Number(e.weight) || 0);
 
-    // Axis labels
-    ctx.fillStyle = "#a7adbb";
-    ctx.font = "12px system-ui";
-    ctx.fillText(`${leftMax} kcal`, 6, padT + 10);
-    ctx.fillText(`${rightMax} g`, padL + plotW + 8, padT + 10);
-
-    // X labels (min/mid/max)
-    const labelIdxs = dates.length <= 2
-      ? [0, dates.length - 1]
-      : [0, Math.floor((dates.length - 1) / 2), dates.length - 1];
-
-    ctx.fillStyle = "#a7adbb";
-    ctx.font = "12px system-ui";
-    for (const idx of labelIdxs) {
-      const d = dates[idx];
-      const x = xFor(d);
-      const textW = ctx.measureText(d).width;
-      ctx.fillText(d, x - textW / 2, padT + plotH + 26);
+    weightChart.update();
     }
 
-    // Draw series
-    function drawSeries(series, yFn) {
-      for (const s of series) {
-        if (!s.points.length) continue;
-        ctx.strokeStyle = s.color;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        s.points.forEach((p, i) => {
-          const x = xFor(p.date);
-          const y = yFn(p.value);
-          if (i === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        });
-        ctx.stroke();
+    function redrawAllCharts() {
+    if (!ensureCharts()) return;
 
-        // points
-        ctx.fillStyle = s.color;
-        for (const p of s.points) {
-          const x = xFor(p.date);
-          const y = yFn(p.value);
-          ctx.beginPath();
-          ctx.arc(x, y, 2.5, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
-    }
-
-    drawSeries(seriesLeft, yLeft);
-    drawSeries(seriesRight, yRight);
-
-    // Legend
-    const legend = [...seriesLeft, ...seriesRight].map(s => ({ name: s.name, color: s.color }));
-    let lx = padL;
-    let ly = padT + 6;
-    ctx.font = "12px system-ui";
-    for (const item of legend) {
-      ctx.fillStyle = item.color;
-      ctx.fillRect(lx, ly, 10, 10);
-      ctx.fillStyle = "#e7e9ee";
-      ctx.fillText(item.name, lx + 14, ly + 10);
-      lx += 14 + ctx.measureText(item.name).width + 14;
-      if (lx > padL + plotW - 120) { lx = padL; ly += 16; }
-    }
-  }
-
-  function drawSingleLineChart(canvas, title, points, color) {
-    const ctx = setCanvasHiDPI(canvas);
-    const rect = canvas.getBoundingClientRect();
-    const W = rect.width;
-    const H = rect.height;
-    ctx.clearRect(0, 0, W, H);
-
-    const padL = 56;
-    const padR = 16;
-    const padT = 28;
-    const padB = 36;
-    const plotW = W - padL - padR;
-    const plotH = H - padT - padB;
-
-    if (!points.length) {
-      ctx.fillStyle = "#a7adbb";
-      ctx.font = "14px system-ui";
-      ctx.fillText("No data in range.", padL, padT + 24);
-      return;
-    }
-
-    const dates = points.map(p => p.date);
-    const xFor = (date) => {
-      const i = dates.indexOf(date);
-      if (dates.length <= 1) return padL + plotW / 2;
-      return padL + (i / (dates.length - 1)) * plotW;
-    };
-
-    const maxRaw = Math.max(...points.map(p => p.value));
-    const maxY = niceMax(maxRaw * 1.08);
-    const yFor = (v) => padT + plotH - (clamp(v, 0, maxY) / maxY) * plotH;
-
-    // Title
-    ctx.fillStyle = "#e7e9ee";
-    ctx.font = "600 14px system-ui";
-    ctx.fillText(title, padL, 18);
-
-    // Grid
-    ctx.strokeStyle = "rgba(255,255,255,0.08)";
-    ctx.lineWidth = 1;
-    const gridLines = 5;
-    for (let i = 0; i <= gridLines; i++) {
-      const y = padT + (i / gridLines) * plotH;
-      ctx.beginPath();
-      ctx.moveTo(padL, y);
-      ctx.lineTo(padL + plotW, y);
-      ctx.stroke();
-    }
-
-    // Axes
-    ctx.strokeStyle = "rgba(255,255,255,0.18)";
-    ctx.beginPath();
-    ctx.moveTo(padL, padT);
-    ctx.lineTo(padL, padT + plotH);
-    ctx.lineTo(padL + plotW, padT + plotH);
-    ctx.stroke();
-
-    // Y label
-    ctx.fillStyle = "#a7adbb";
-    ctx.font = "12px system-ui";
-    ctx.fillText(`${maxY}`, 10, padT + 10);
-
-    // X labels (min/mid/max)
-    const labelIdxs = dates.length <= 2
-      ? [0, dates.length - 1]
-      : [0, Math.floor((dates.length - 1) / 2), dates.length - 1];
-
-    ctx.fillStyle = "#a7adbb";
-    for (const idx of labelIdxs) {
-      const d = dates[idx];
-      const x = xFor(d);
-      const textW = ctx.measureText(d).width;
-      ctx.fillText(d, x - textW / 2, padT + plotH + 26);
-    }
-
-    // Line
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    points.forEach((p, i) => {
-      const x = xFor(p.date);
-      const y = yFor(p.value);
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-
-    // points
-    ctx.fillStyle = color;
-    for (const p of points) {
-      const x = xFor(p.date);
-      const y = yFor(p.value);
-      ctx.beginPath();
-      ctx.arc(x, y, 2.5, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-
-  function redrawAllCharts() {
     const mStart = macroStart.value || null;
     const mEnd = macroEnd.value || null;
     const wStart = weightStart.value || null;
     const wEnd = weightEnd.value || null;
 
-    const macros = filterByRange(macroHistory, mStart, mEnd).sort((a,b) => a.date.localeCompare(b.date));
-    const weights = filterByRange(weightHistory, wStart, wEnd).sort((a,b) => a.date.localeCompare(b.date));
+    const macros = filterByRange(macroHistory, mStart, mEnd).sort((a, b) => a.date.localeCompare(b.date));
+    const weights = filterByRange(weightHistory, wStart, wEnd).sort((a, b) => a.date.localeCompare(b.date));
 
-    const leftSeries = [{
-      name: "Calories",
-      color: "#5aa9ff",
-      points: macros.map(e => ({ date: e.date, value: Number(e.calories) || 0 }))
-    }];
-
-    const rightSeries = [
-      { name: "Protein", color: "#7CFF6B", points: macros.map(e => ({ date: e.date, value: Number(e.protein) || 0 })) },
-      { name: "Fat",     color: "#FFB84D", points: macros.map(e => ({ date: e.date, value: Number(e.fat) || 0 })) },
-      { name: "Carbs",   color: "#FF6BD6", points: macros.map(e => ({ date: e.date, value: Number(e.carbs) || 0 })) },
-    ];
-
-    drawMultiAxisLineChart(macroCanvas, "Calories + Macros", leftSeries, rightSeries);
-
-    const weightPoints = weights.map(e => ({ date: e.date, value: Number(e.weight) || 0 }));
-    drawSingleLineChart(weightCanvas, "Weight", weightPoints, "#5aa9ff");
-  }
-
-  function setDefaultDateRanges() {
-    // Defaults: full range if present
-    const macroDates = macroHistory.map(e => e.date).sort();
-    if (macroDates.length) {
-      macroStart.value = macroDates[0];
-      macroEnd.value = macroDates[macroDates.length - 1];
-    } else {
-      macroStart.value = "";
-      macroEnd.value = "";
+    updateMacroChart(macros);
+    updateWeightChart(weights);
     }
 
-    const weightDates = weightHistory.map(e => e.date).sort();
-    if (weightDates.length) {
-      weightStart.value = weightDates[0];
-      weightEnd.value = weightDates[weightDates.length - 1];
-    } else {
-      weightStart.value = "";
-      weightEnd.value = "";
-    }
-  }
 
   // ---------- Events ----------
   foodSelect.addEventListener("change", () => {

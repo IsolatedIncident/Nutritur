@@ -16,19 +16,6 @@ window.FOODS = [
     }
     },
 
-    // Eggs (serving: 1 egg 56g -> 80 kcal, P7 C0 F5)
-    {
-    id: "egg",
-    name: "Egg (whole, label-based)",
-    unit: "g",
-    perUnit: {
-        kcal: 1.428571,
-        protein: 0.125000,
-        fat: 0.089286,
-        carbs: 0.000000
-    }
-    },
-
     // Mailhot's Best Sausage (serving: 3 links 99g -> 250 kcal, P16 C3 F19)
     {
     id: "mailhots_sausage",
@@ -65,20 +52,6 @@ window.FOODS = [
         protein: 0.139535,
         fat: 0.081395,
         carbs: 0.441860
-    }
-    },
-
-    // Ball Park Burger Bun
-    // Serving: 1 bun (53g) -> 150 kcal, P4 C28 F2
-    {
-    id: "ballpark_burger_bun_grams",
-    name: "Ball Park Burger Bun",
-    unit: "g",
-    perUnit: {
-        kcal: 2.830189,
-        protein: 0.075472,
-        fat: 0.037736,
-        carbs: 0.528302
     }
     },
 
