@@ -15,6 +15,7 @@ body {
   background: var(--bg);
   color: var(--text);
   padding: 24px;
+  display: flex;
 }
 
 .card {
@@ -173,3 +174,86 @@ code {
 }
 
 .subtle { margin-top: 8px; }
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.headerActions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.panel {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  background: #0f1218;
+}
+
+.panel h2 {
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+
+.spacer { height: 12px; }
+
+.chartSection {
+  margin-top: 14px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.chartHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.rangeControls {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.row.inline {
+  margin: 0;
+  width: auto;
+}
+
+.row.inline input {
+  min-width: 160px;
+}
+
+.canvasWrap {
+  margin-top: 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0f1218;
+}
+
+canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@media (max-width: 860px) {
+  .twoCol { grid-template-columns: 1fr; }
+}
+

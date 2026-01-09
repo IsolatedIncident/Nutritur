@@ -3,10 +3,114 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Macro Calculator</title>
+  <title>Macros + History</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
+
+  <!-- HISTORY CARD -->
+  <div class="card">
+    <div class="headerRow">
+      <h1>History</h1>
+      <div class="headerActions">
+        <button id="exportMacrosBtn" class="secondary small">Export macro_history.json</button>
+        <button id="exportWeightsBtn" class="secondary small">Export weight_history.json</button>
+      </div>
+    </div>
+
+    <div class="twoCol">
+      <div class="panel">
+        <h2>Save Day</h2>
+        <div class="row">
+          <label for="saveDayDate">Date</label>
+          <input id="saveDayDate" type="date" />
+        </div>
+        <button id="saveDayBtn">Save Day (from Today’s Tally)</button>
+        <div class="hint subtle" id="saveDayMsg"></div>
+
+        <div class="spacer"></div>
+
+        <h2>Weight Tracker</h2>
+        <div class="row">
+          <label for="weightDate">Date</label>
+          <input id="weightDate" type="date" />
+        </div>
+        <div class="row">
+          <label for="weightInput">Weight</label>
+          <input id="weightInput" type="number" inputmode="decimal" step="0.1" placeholder="e.g. 185.4" />
+        </div>
+        <button id="saveWeightBtn">Save Weight</button>
+        <div class="hint subtle" id="saveWeightMsg"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Import / Load JSON</h2>
+
+        <div class="row">
+          <label>Load macro_history.json</label>
+          <input id="importMacrosFile" type="file" accept="application/json,.json" />
+        </div>
+
+        <div class="row">
+          <label>Load weight_history.json</label>
+          <input id="importWeightsFile" type="file" accept="application/json,.json" />
+        </div>
+
+        <div class="hint subtle">
+          Tip: “Save Day” / “Save Weight” will download JSON files. Later you can re-load them here.
+        </div>
+      </div>
+    </div>
+
+    <div class="chartSection">
+      <div class="chartHeader">
+        <h2>Macro Trend</h2>
+        <div class="rangeControls">
+          <div class="row inline">
+            <label for="macroStart">Start</label>
+            <input id="macroStart" type="date" />
+          </div>
+          <div class="row inline">
+            <label for="macroEnd">End</label>
+            <input id="macroEnd" type="date" />
+          </div>
+          <button id="macroRangeApply" class="secondary small">Apply</button>
+        </div>
+      </div>
+
+      <div class="hint subtle">
+        Calories use the <strong>left</strong> axis (kcal). Protein/Fat/Carbs use the <strong>right</strong> axis (grams).
+      </div>
+
+      <div class="canvasWrap">
+        <canvas id="macroChart" width="900" height="320"></canvas>
+      </div>
+    </div>
+
+    <div class="chartSection">
+      <div class="chartHeader">
+        <h2>Weight Trend</h2>
+        <div class="rangeControls">
+          <div class="row inline">
+            <label for="weightStart">Start</label>
+            <input id="weightStart" type="date" />
+          </div>
+          <div class="row inline">
+            <label for="weightEnd">End</label>
+            <input id="weightEnd" type="date" />
+          </div>
+          <button id="weightRangeApply" class="secondary small">Apply</button>
+        </div>
+      </div>
+
+      <div class="canvasWrap">
+        <canvas id="weightChart" width="900" height="320"></canvas>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- MACRO CALCULATOR CARD -->
   <div class="card">
     <h1>Macro Calculator</h1>
 
@@ -52,8 +156,8 @@
 
     <div class="log">
       <div class="logHeader">
-        <h2>Today’s Intake</h2>
-        <button id="clearLogBtn" class="secondary small">Clear Intake</button>
+        <h2>Today’s Tally</h2>
+        <button id="clearLogBtn" class="secondary small">Clear Tally</button>
       </div>
 
       <div class="logTableWrap">
@@ -85,12 +189,12 @@
       </div>
 
       <div class="hint subtle">
-        Saved locally in your browser (auto). Edit <code>foods.js</code> to add foods/measures.
+        Your tally + histories are also stored in your browser (localStorage) automatically.
       </div>
     </div>
 
     <p class="footer">
-      Edit <code>foods.js</code> to add/adjust foods (values are per 1 g or per 1 ml).
+      Edit <code>foods.js</code> to add/adjust foods/measures.
     </p>
   </div>
 
