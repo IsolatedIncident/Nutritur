@@ -18,7 +18,6 @@ body {
 }
 
 .card {
-  max-width: 520px;
   margin: 0 auto;
   background: var(--card);
   border: 1px solid var(--border);
