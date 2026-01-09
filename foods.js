@@ -18,7 +18,7 @@ window.FOODS = [
 
     // Eggs (serving: 1 egg 56g -> 80 kcal, P7 C0 F5)
     {
-    id: "egg_whole",
+    id: "egg",
     name: "Egg (whole, label-based)",
     unit: "g",
     perUnit: {
@@ -71,7 +71,7 @@ window.FOODS = [
     // Ball Park Burger Bun
     // Serving: 1 bun (53g) -> 150 kcal, P4 C28 F2
     {
-    id: "ballpark_burger_bun",
+    id: "ballpark_burger_bun_grams",
     name: "Ball Park Burger Bun",
     unit: "g",
     perUnit: {
@@ -109,6 +109,27 @@ window.FOODS = [
         carbs: 0.000000
     }
     },
+    {
+    id: "egg_whole",
+    name: "Egg (whole, label-based)",
+    baseUnit: "g",
+    perBaseUnit: { kcal: 1.428571, protein: 0.125000, fat: 0.089286, carbs: 0.000000 },
+    measures: [
+        { id: "g", label: "grams (g)", kind: "g", basePerMeasure: 1 },
+        { id: "egg", label: "egg (56 g)", kind: "unit", basePerMeasure: 56 }
+    ]
+    },
+    {
+    id: "ballpark_burger_bun",
+    name: "Ball Park Burger Bun",
+    baseUnit: "g",
+    perBaseUnit: { kcal: 2.830189, protein: 0.075472, fat: 0.037736, carbs: 0.528302 },
+    measures: [
+        { id: "g", label: "grams (g)", kind: "g", basePerMeasure: 1 },
+        { id: "bun", label: "bun (53 g)", kind: "unit", basePerMeasure: 53 }
+    ]
+    },
+
 
 ];
 

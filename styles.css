@@ -111,3 +111,66 @@ code {
 }
 
 .hidden { display: none; }
+
+
+.log {
+  margin-top: 16px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.logHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.small {
+  flex: 0;
+  padding: 8px 10px;
+  font-weight: 700;
+}
+
+.logTableWrap {
+  margin-top: 10px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #0f1218;
+}
+
+.logTable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 520px;
+}
+
+.logTable th, .logTable td {
+  padding: 10px 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  font-size: 13px;
+}
+
+.logTable th {
+  text-align: left;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.logTable td.num, .logTable th.num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.iconBtn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.subtle { margin-top: 8px; }

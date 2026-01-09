@@ -3,16 +3,21 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Food Macro Calculator</title>
+  <title>Macro Calculator</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
   <div class="card">
-    <h1>Food Macro Calculator</h1>
+    <h1>Macro Calculator</h1>
 
     <div class="row">
       <label for="foodSelect">Food</label>
       <select id="foodSelect"></select>
+    </div>
+
+    <div class="row">
+      <label for="measureSelect">Measure</label>
+      <select id="measureSelect"></select>
     </div>
 
     <div class="row">
@@ -28,22 +33,60 @@
     </div>
 
     <div class="actions">
-      <button id="calcBtn">Calculate</button>
-      <button id="clearBtn" class="secondary">Clear</button>
+      <button id="addBtn">Add to Today’s Tally</button>
+      <button id="clearEntryBtn" class="secondary">Clear Entry</button>
     </div>
 
-    <div id="result" class="result hidden">
-      <h2>Totals</h2>
+    <div id="preview" class="result hidden">
+      <h2>This Entry</h2>
       <table>
         <tbody>
-          <tr><td>Calories</td><td><strong id="outKcal">0</strong> kcal</td></tr>
-          <tr><td>Protein</td><td><strong id="outProtein">0</strong> g</td></tr>
-          <tr><td>Fat</td><td><strong id="outFat">0</strong> g</td></tr>
-          <tr><td>Carbs</td><td><strong id="outCarbs">0</strong> g</td></tr>
+          <tr><td>Calories</td><td><strong id="pKcal">0</strong> kcal</td></tr>
+          <tr><td>Protein</td><td><strong id="pProtein">0</strong> g</td></tr>
+          <tr><td>Fat</td><td><strong id="pFat">0</strong> g</td></tr>
+          <tr><td>Carbs</td><td><strong id="pCarbs">0</strong> g</td></tr>
         </tbody>
       </table>
-
       <div class="hint" id="perUnitHint"></div>
+    </div>
+
+    <div class="log">
+      <div class="logHeader">
+        <h2>Today’s Intake</h2>
+        <button id="clearLogBtn" class="secondary small">Clear Intake</button>
+      </div>
+
+      <div class="logTableWrap">
+        <table class="logTable">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th class="num">Amount</th>
+              <th class="num">kcal</th>
+              <th class="num">P</th>
+              <th class="num">F</th>
+              <th class="num">C</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="logBody"></tbody>
+          <tfoot>
+            <tr>
+              <td><strong>Total</strong></td>
+              <td></td>
+              <td class="num"><strong id="tKcal">0</strong></td>
+              <td class="num"><strong id="tProtein">0</strong></td>
+              <td class="num"><strong id="tFat">0</strong></td>
+              <td class="num"><strong id="tCarbs">0</strong></td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="hint subtle">
+        Saved locally in your browser (auto). Edit <code>foods.js</code> to add foods/measures.
+      </div>
     </div>
 
     <p class="footer">
@@ -51,9 +94,7 @@
     </p>
   </div>
 
-  <!-- Config first -->
   <script src="./foods.js"></script>
-  <!-- App logic -->
   <script src="./app.js"></script>
 </body>
 </html>
