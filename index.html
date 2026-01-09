@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Food Macro Calculator</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="card">
+    <h1>Food Macro Calculator</h1>
+
+    <div class="row">
+      <label for="foodSelect">Food</label>
+      <select id="foodSelect"></select>
+    </div>
+
+    <div class="row">
+      <label for="amountInput">Amount (<span id="unitLabel">g</span>)</label>
+      <input
+        id="amountInput"
+        type="number"
+        inputmode="decimal"
+        min="0"
+        step="0.1"
+        placeholder="Enter amount…"
+      />
+    </div>
+
+    <div class="actions">
+      <button id="calcBtn">Calculate</button>
+      <button id="clearBtn" class="secondary">Clear</button>
+    </div>
+
+    <div id="result" class="result hidden">
+      <h2>Totals</h2>
+      <table>
+        <tbody>
+          <tr><td>Calories</td><td><strong id="outKcal">0</strong> kcal</td></tr>
+          <tr><td>Protein</td><td><strong id="outProtein">0</strong> g</td></tr>
+          <tr><td>Fat</td><td><strong id="outFat">0</strong> g</td></tr>
+          <tr><td>Carbs</td><td><strong id="outCarbs">0</strong> g</td></tr>
+        </tbody>
+      </table>
+
+      <div class="hint" id="perUnitHint"></div>
+    </div>
+
+    <p class="footer">
+      Edit <code>foods.js</code> to add/adjust foods (values are per 1 g or per 1 ml).
+    </p>
+  </div>
+
+  <!-- Config first -->
+  <script src="./foods.js"></script>
+  <!-- App logic -->
+  <script src="./app.js"></script>
+</body>
+</html>
