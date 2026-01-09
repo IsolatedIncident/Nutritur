@@ -20,28 +20,16 @@
         <div class="row">
         
         <h2>Import History</h2><input id="importHistoryFile" type="file" accept="application/json,.json">
-        <button id="exportHistoryBtn" class="secondary small">Export history.json</button></div>
+        <button id="exportHistoryBtn" class="secondary small">Download History</button></div>
         <div class="row">
+        
         <h2>Save Day</h2><label for="saveDayDate">Date</label>
         <input id="saveDayDate" type="date">
-        <button id="saveDayBtn">Save Day (from Today’s Tally)</button><div class="hint subtle" id="saveDayMsg"></div></div>
+        <label for="weightInput">Weight</label><input id="weightInput" type="number" inputmode="decimal" step="0.1" placeholder="e.g. 203.0"><button id="saveDayBtn">Save Day (from Today’s Intake)</button><div class="hint subtle" id="saveDayMsg"></div>
+        </div>
         
         
-
-        <div class="spacer"></div>
-
-        
-        <div class="row">
-        <h2>Weight Tracker</h2><label for="weightDate">Date</label>
-        <input id="weightDate" type="date">
-        <button id="saveWeightBtn">Save Weight</button><div class="hint subtle" id="saveWeightMsg"></div></div>
-        
-        
-        
-    <div class="row">
-        <label for="weightInput">Weight</label>
-        <input id="weightInput" type="number" inputmode="decimal" step="0.1" placeholder="e.g. 203.0">
-        </div></div>
+    </div>
 
     
 
@@ -88,7 +76,7 @@
     </div>
 
     <div class="actions">
-      <button id="addBtn">Add to Today’s Tally</button>
+      <button id="addBtn">Add to Today’s Intake</button>
       <button id="clearEntryBtn" class="secondary">Clear Entry</button>
     </div>
 
@@ -107,8 +95,8 @@
 
     <div class="log">
       <div class="logHeader">
-        <h2>Today’s Tally</h2>
-        <button id="clearLogBtn" class="secondary small">Clear Tally</button>
+        <h2>Today’s Intake</h2>
+        <button id="clearLogBtn" class="secondary small">Clear Intake</button>
       </div>
 
       <div class="logTableWrap">
@@ -142,7 +130,7 @@
       </div>
 
       <div class="hint subtle">
-        Your tally + histories are also stored in your browser (localStorage) automatically.
+        Your Intake is stored in your browser (localStorage) automatically.
       </div>
     </div>
 

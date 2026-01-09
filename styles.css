@@ -202,7 +202,6 @@ code {
   border-radius: 12px;
   padding: 12px;
   background: #0f1218;
-  display: flex;
 }
 
 .panel h2 {
@@ -263,7 +262,6 @@ canvas {
 
 .checks {
   display: flex;
-  /*! grid-template-columns: 1fr 1fr; */
   gap: 8px 12px;
   margin-top: 8px;
 }
@@ -276,4 +274,4 @@ canvas {
   font-size: 13px;
 }
 
-.canvasWrap { height: 360px; }
+/* .canvasWrap { height: 360px; } */

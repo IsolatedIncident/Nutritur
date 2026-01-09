@@ -38,7 +38,6 @@
 
     const weightDate   = document.getElementById("weightDate");
     const weightInput  = document.getElementById("weightInput");
-    const saveWeightBtn= document.getElementById("saveWeightBtn");
     const saveWeightMsg= document.getElementById("saveWeightMsg");
 
     const exportHistoryBtn  = document.getElementById("exportHistoryBtn");
@@ -52,7 +51,7 @@
 
     // ---------- State ----------
     let history = loadJSON_any(STORAGE_HISTORY, []);  // array of entries
-
+    let dailyIntake = loadJSON_any(STORAGE_TALLY, []);
 
   // ---------- Utils ----------
   function todayISO() {
@@ -104,7 +103,7 @@
     }
 
 
-  function saveJSON(key, value) {
+  function saveToDailyIntake(key, value) {
     try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
   }
 
@@ -154,6 +153,7 @@
   }
 
   function populateFoods() {
+    console.log('populating')
     foodSelect.innerHTML = "";
     if (foods.length === 0) {
       const opt = document.createElement("option");
@@ -289,26 +289,26 @@
     const entry = computeEntryPreview();
     if (!entry) return;
 
-    log.push({
+    dailyIntake.push({
       id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
       ...entry
     });
 
-    saveJSON(STORAGE_TALLY, log);
+    saveToDailyIntake(STORAGE_TALLY, dailyIntake);
     renderLog();
     renderTotals();
   }
 
   function removeFromLog(id) {
-    log = log.filter(e => e.id !== id);
-    saveJSON(STORAGE_TALLY, log);
+    dailyIntake = dailyIntake.filter(e => e.id !== id);
+    saveToDailyIntake(STORAGE_TALLY, dailyIntake);
     renderLog();
     renderTotals();
   }
 
   function clearLog() {
-    log = [];
-    saveJSON(STORAGE_TALLY, log);
+    dailyIntake = [];
+    saveToDailyIntake(STORAGE_TALLY, dailyIntake);
     renderLog();
     renderTotals();
   }
@@ -320,7 +320,7 @@
   }
 
   function currentTallyTotals() {
-    return log.reduce((acc, e) => {
+    return dailyIntake.reduce((acc, e) => {
       acc.kcal += e.totals.kcal;
       acc.protein += e.totals.protein;
       acc.fat += e.totals.fat;
@@ -332,7 +332,7 @@
   function renderLog() {
     logBody.innerHTML = "";
 
-    if (log.length === 0) {
+    if (dailyIntake.length === 0) {
       const tr = document.createElement("tr");
       tr.innerHTML = `<td colspan="7" style="color: var(--muted); padding: 14px 10px;">
         No items yet — add something above.
@@ -341,7 +341,7 @@
       return;
     }
 
-    for (const e of log) {
+    for (const e of dailyIntake) {
       const tr = document.createElement("tr");
 
       // show amount as int if it's a "count-ish" measure
@@ -393,6 +393,12 @@
   function saveDay() {
     const date = saveDayDate.value || todayISO();
     const totals = currentTallyTotals();
+    const w = Number(weightInput.value);
+
+    if (!Number.isFinite(w) || w <= 0) {
+        saveWeightMsg.textContent = "Enter a valid weight first.";
+        return;
+    }
 
     // Find existing entry for date or create new
     const existing = history.find(e => e.date === date) || { date };
@@ -401,39 +407,15 @@
     existing.protein  = round(totals.protein || 0, 1);
     existing.fat      = round(totals.fat || 0, 1);
     existing.carbs    = round(totals.carbs || 0, 1);
+    existing.weight   = round(w, 1);
 
     computeRatios(existing);
 
     history = upsertByDate(history, existing);
     saveJSON_any(STORAGE_HISTORY, history);
 
-    downloadJSON("history.json", history);
-    saveDayMsg.textContent = `Saved ${date} + downloaded history.json`;
-
-    setDefaultHistoryRange();
-    redrawHistoryChart();
-    }
-
-  function saveWeight() {
-    const date = weightDate.value || todayISO();
-    const w = Number(weightInput.value);
-
-    if (!Number.isFinite(w) || w <= 0) {
-        saveWeightMsg.textContent = "Enter a valid weight first.";
-        return;
-    }
-
-    const existing = history.find(e => e.date === date) || { date };
-    existing.weight = round(w, 1);
-
-    // If macros exist, keep ratios updated too
-    computeRatios(existing);
-
-    history = upsertByDate(history, existing);
-    saveJSON_any(STORAGE_HISTORY, history);
-
-    downloadJSON("history.json", history);
-    saveWeightMsg.textContent = `Saved ${date} + downloaded history.json`;
+    // downloadJSON("history.json", history);
+    saveDayMsg.textContent = `Saved ${date}`;
 
     setDefaultHistoryRange();
     redrawHistoryChart();
@@ -627,17 +609,6 @@
   clearLogBtn.addEventListener("click", () => clearLog());
 
   saveDayBtn.addEventListener("click", () => saveDay());
-  saveWeightBtn.addEventListener("click", () => saveWeight());
-
-  exportMacrosBtn.addEventListener("click", () => downloadJSON("macro_history.json", macroHistory));
-  exportWeightsBtn.addEventListener("click", () => downloadJSON("weight_history.json", weightHistory));
-
-  importMacrosFile.addEventListener("change", handleImportMacros);
-  importWeightsFile.addEventListener("change", handleImportWeights);
-
-  macroRangeApply.addEventListener("click", redrawAllCharts);
-  weightRangeApply.addEventListener("click", redrawAllCharts);
-
   window.addEventListener("resize", () => {
     // Re-render for responsive canvas sizing
     redrawAllCharts();
@@ -662,6 +633,5 @@
   redrawHistoryChart();  
 
   saveDayBtn.addEventListener("click", saveDay);
-  saveWeightBtn.addEventListener("click", saveWeight);
 
 })();
