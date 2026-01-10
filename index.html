@@ -8,37 +8,10 @@
 </head>
 <body>
 
-
-  <div class="headerRow">
-    <h1>History</h1>
-    <div class="headerActions">
-        
-    </div>
-    </div>
-
-    <div class="panel">
-        <div class="row">
-        
-        <h2>Import History</h2><input id="importHistoryFile" type="file" accept="application/json,.json">
-        <button id="exportHistoryBtn" class="secondary small">Download History</button></div>
-        <div class="row">
-        
-        <h2>Save Day</h2><label for="saveDayDate">Date</label>
-        <input id="saveDayDate" type="date">
-        <label for="weightInput">Weight</label><input id="weightInput" type="number" inputmode="decimal" step="0.1" placeholder="e.g. 203.0"><button id="saveDayBtn">Save Day (from Today’s Intake)</button><div class="hint subtle" id="saveDayMsg"></div>
-        </div>
-        
-        
-    </div>
-
-    
-
-
-
   <div class="chartSection">
     <div class="chartHeader">
-        <h2>Trend</h2>
-        <div class="rangeControls">
+        
+        <div class="row"><div class="rangeControls">
         <div class="row inline">
             <label for="historyStart">Start</label>
             <input id="historyStart" type="date">
@@ -48,7 +21,7 @@
             <input id="historyEnd" type="date">
         </div>
         <button id="historyRangeApply" class="secondary small">Apply</button>
-        </div>
+        </div></div><input id="importHistoryFile" type="file" accept="application/json,.json" text="Import"><button id="exportHistoryBtn">Download History</button>
     </div>
 
     <div class="canvasWrap">
@@ -60,43 +33,43 @@
   <div class="card">
     <h1>Macro Calculator</h1>
 
-    <div class="row">
+    <div class="panel"><div class="panel" style="display: grid;flex: 1;"><div class="row">
       <label for="foodSelect">Food</label>
-      <select id="foodSelect"></select>
-    </div>
-
-    <div class="row">
+      <select id="foodSelect"><option value="whey_protein_powder">Whey Protein Powder (label-based)</option><option value="mailhots_sausage">Mailhot's Best Sausage (label-based)</option><option value="whole_milk_hood">Whole Milk (Hood, label-based)</option><option value="mission_carb_balance_tortilla">Mission Carb Balance Tortilla (flour)</option><option value="ground_turkey">Ground Turkey (label-based)</option><option value="chicken_breast">Chicken Breast (boneless/skinless, label-based)</option><option value="egg_whole">Egg (whole, label-based)</option><option value="ballpark_burger_bun">Ball Park Burger Bun</option></select>
+    </div><div class="row">
       <label for="measureSelect">Measure</label>
-      <select id="measureSelect"></select>
-    </div>
-
-    <div class="row">
-      <label for="amountInput">Amount (<span id="unitLabel">g</span>)</label>
-      <input id="amountInput" type="number" inputmode="decimal" min="0" step="0.1" placeholder="Enter amount…">
-    </div>
-
-    <div class="actions">
+      <select id="measureSelect"><option value="base">milliliters (ml)</option></select>
+    </div><div class="row">
+      <label for="amountInput">Amount (<span id="unitLabel">ml</span>)</label>
+      <input id="amountInput" type="number" inputmode="decimal" min="0" step="0.1" placeholder="Enter ml…">
+    </div><div class="actions">
       <button id="addBtn">Add to Today’s Intake</button>
-      <button id="clearEntryBtn" class="secondary">Clear Entry</button>
-    </div>
-
-    <div id="preview" class="result hidden">
+      
+    </div><div></div></div><div id="preview" class="result hidden">
       <h2>This Entry</h2>
       <table>
         <tbody>
-          <tr><td>Calories</td><td><strong id="pKcal">4</strong> kcal</td></tr>
-          <tr><td>Protein</td><td><strong id="pProtein">0.8</strong> g</td></tr>
-          <tr><td>Fat</td><td><strong id="pFat">0.0</strong> g</td></tr>
-          <tr><td>Carbs</td><td><strong id="pCarbs">0.1</strong> g</td></tr>
+          <tr><td>Calories</td><td><strong id="pKcal">44</strong> kcal</td></tr>
+          <tr><td>Protein</td><td><strong id="pProtein">2.3</strong> g</td></tr>
+          <tr><td>Fat</td><td><strong id="pFat">2.3</strong> g</td></tr>
+          <tr><td>Carbs</td><td><strong id="pCarbs">3.5</strong> g</td></tr>
         </tbody>
       </table>
-      <div class="hint" id="perUnitHint">Per 1 g: 3.870968 kcal, 0.774194P, 0.048387F, 0.129032C. (1.0 g total)</div>
-    </div>
+      <div class="hint" id="perUnitHint">Per 1 ml: 0.625 kcal, 0.033333P, 0.033333F, 0.05C. (70.0 ml total)</div>
+    <button id="clearEntryBtn" class="secondary" style="">Clear Entry</button></div></div>
+
+    
+
+    
+
+    
+
+    
 
     <div class="log">
       <div class="logHeader">
         <h2>Today’s Intake</h2>
-        <button id="clearLogBtn" class="secondary small">Clear Intake</button>
+        
       </div>
 
       <div class="logTableWrap">
@@ -129,20 +102,21 @@
         </table>
       </div>
 
-      <div class="hint subtle">
-        Your Intake is stored in your browser (localStorage) automatically.
-      </div>
+      <button id="clearLogBtn" class="secondary small">Clear Intake</button>
     </div>
 
-    <p class="footer">
+    <div class="panel">
+        
+        <div class="row"><label for="saveDayDate">Date</label><input id="saveDayDate" type="date"></div><div class="row"><label for="weightInput">Weight</label><input id="weightInput" type="number" inputmode="decimal" step="0.1" placeholder="e.g. 203.0"></div>
+        
+        <button id="saveDayBtn">Save Day (from Today’s Intake)</button>
+        </div><div class="hint subtle" id="saveDayMsg">Saved 2026-01-09</div><p class="footer">
       Edit <code>foods.js</code> to add/adjust foods/measures.
     </p>
   </div><script src="./foods.js"></script>
   <!-- Chart.js from node_modules (UMD build) -->
   <script src="./node_modules/chart.js/dist/chart.umd.js"></script>
   <script src="./app.js"></script>
-
-
 
 </body>
 </html>
