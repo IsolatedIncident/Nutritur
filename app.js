@@ -295,6 +295,8 @@
     });
 
     saveToDailyIntake(STORAGE_TALLY, dailyIntake);
+    clearEntry();
+    amountInput.value = 0;
     renderLog();
     renderTotals();
   }
