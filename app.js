@@ -12,7 +12,6 @@
   const unitLabel     = document.getElementById("unitLabel");
 
   const addBtn        = document.getElementById("addBtn");
-  const clearEntryBtn = document.getElementById("clearEntryBtn");
   const clearLogBtn   = document.getElementById("clearLogBtn");
 
   const previewBox = document.getElementById("preview");
@@ -159,7 +158,6 @@
   }
 
   function populateFoods() {
-    console.log('populating')
     foodSelect.innerHTML = "";
     if (foods.length === 0) {
       const opt = document.createElement("option");
@@ -662,14 +660,9 @@
   amountInput.addEventListener("input", () => computeEntryPreview());
 
   addBtn.addEventListener("click", () => addToLog());
-  clearEntryBtn.addEventListener("click", () => clearEntry());
   clearLogBtn.addEventListener("click", () => clearLog());
 
   saveDayBtn.addEventListener("click", () => saveDay());
-  window.addEventListener("resize", () => {
-    // Re-render for responsive canvas sizing
-    redrawAllCharts();
-  });
 
   // ---------- Init ----------
   populateFoods();
@@ -680,10 +673,6 @@
   renderTotals();
 
   saveDayDate.value = todayISO();
-  weightDate.value = todayISO();
-
-  setDefaultDateRanges();
-  redrawAllCharts();
 
   setDefaultHistoryRange();
   ensureHistoryChart();

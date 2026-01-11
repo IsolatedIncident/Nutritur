@@ -101,7 +101,163 @@ window.FOODS = [
         { id: "g", label: "grams (g)", kind: "g", basePerMeasure: 1 },
         { id: "bun", label: "bun (53 g)", kind: "unit", basePerMeasure: 53 }
     ]
+    },
+    // =======================
+    // SAUCES / CONDIMENTS
+    // =======================
+
+    {
+    id: "sweet_baby_rays_garlic_buffalo",
+    name: "Sweet Baby Ray's Garlic Buffalo",
+    baseUnit: "ml",
+    // Label: 1 Tbsp (16 mL) = 35 kcal, 0P, 3.5F, 1C
+    perBaseUnit: {
+        kcal: 2.1875,
+        protein: 0,
+        fat: 0.21875,
+        carbs: 0.0625,
+    },
+    measures: [
+        { id: "ml",   label: "milliliters (ml)", kind: "ml", basePerMeasure: 1 },
+    ],
+    },
+
+    {
+    id: "hannaford_ketchup",
+    name: "Ketchup (Hannaford / label-based)",
+    baseUnit: "g",
+    // Label: 1 Tbsp (17g) = 20 kcal, 0P, 0F, 4C
+    perBaseUnit: {
+        kcal: 20 / 17,
+        protein: 0 / 17,
+        fat: 0 / 17,
+        carbs: 4 / 17,
+    },
+    measures: [
+        { id: "g",    label: "grams (g)", kind: "g", basePerMeasure: 1 },
+        { id: "tbsp", label: "tablespoon (Tbsp)", kind: "g", basePerMeasure: 17 },
+    ],
+    },
+
+    {
+    id: "hellmanns_light_mayo",
+    name: "Hellmann's Light Mayonnaise",
+    baseUnit: "g",
+    // Label: 1 Tbsp (15g) = 35 kcal, 0P, 3.5F, 1C
+    perBaseUnit: {
+        kcal: 35 / 15,
+        protein: 0 / 15,
+        fat: 3.5 / 15,
+        carbs: 1 / 15,
+    },
+    measures: [
+        { id: "g",    label: "grams (g)", kind: "g", basePerMeasure: 1 },
+        { id: "tbsp", label: "tablespoon (Tbsp)", kind: "g", basePerMeasure: 15 },
+    ],
+    },
+
+    // =======================
+    // SOUPS (Amy's)
+    // =======================
+    // Cup weight isn't listed on the can. Using a practical default:
+    //   1 cup soup ≈ 240 g
+    // so "cups" works as a measure in your UI.
+
+    {
+    id: "amys_soup_southwestern_fire_roasted_veg",
+    name: "Amy's Soup - Southwestern Fire Roasted Veg (label-based)",
+    baseUnit: "g",
+    // Label per can: 1 can (405g) = 220 kcal, 6P, 8F, 31C
+    perBaseUnit: {
+        kcal: 220 / 405,
+        protein: 6 / 405,
+        fat: 8 / 405,
+        carbs: 31 / 405,
+    },
+    measures: [
+        { id: "g",   label: "grams (g)", kind: "g", basePerMeasure: 1 },
+        { id: "cup", label: "cup (~240g)", kind: "g", basePerMeasure: 240 },
+        { id: "can", label: "1 can (405g)", kind: "g", basePerMeasure: 405 },
+    ],
+    },
+
+    {
+    id: "amys_soup_rustic_italian_vegetable",
+    name: "Amy's Soup - Rustic Italian Vegetable (label-based)",
+    baseUnit: "g",
+    // Label per can: 1 can (397g) = 310 kcal, 8P, 13F, 39C
+    perBaseUnit: {
+        kcal: 310 / 397,
+        protein: 8 / 397,
+        fat: 13 / 397,
+        carbs: 39 / 397,
+    },
+    measures: [
+        { id: "g",   label: "grams (g)", kind: "g", basePerMeasure: 1 },
+        { id: "cup", label: "cup (~240g)", kind: "g", basePerMeasure: 240 },
+        { id: "can", label: "1 can (397g)", kind: "g", basePerMeasure: 397 },
+    ],
+    },
+
+    {
+    id: "amys_soup_chunky_vegetable",
+    name: "Amy's Soup - Chunky Vegetable (label-based)",
+    baseUnit: "g",
+    // Label per can: 1 can (405g) = 120 kcal, 4P, 2.5F, 18C
+    perBaseUnit: {
+        kcal: 120 / 405,
+        protein: 4 / 405,
+        fat: 2.5 / 405,
+        carbs: 18 / 405,
+    },
+    measures: [
+        { id: "g",   label: "grams (g)", kind: "g", basePerMeasure: 1 },
+        { id: "cup", label: "cup (~240g)", kind: "g", basePerMeasure: 240 },
+        { id: "can", label: "1 can (405g)", kind: "g", basePerMeasure: 405 },
+    ],
+    },
+
+    // =======================
+    // DRINKS
+    // =======================
+
+    {
+    id: "oakhurst_vitamin_d_milk",
+    name: "Milk - Oakhurst Vitamin D (label-based)",
+    baseUnit: "ml",
+    // Label: 1 cup (236mL) = 150 kcal, 8P, 8F, 12C
+    perBaseUnit: {
+        kcal: 150 / 236,
+        protein: 8 / 236,
+        fat: 8 / 236,
+        carbs: 12 / 236,
+    },
+    measures: [
+        { id: "ml",  label: "milliliters (ml)", kind: "ml", basePerMeasure: 1 },
+        { id: "cup", label: "1 cup (236 mL)", kind: "ml", basePerMeasure: 236 },
+        { id: "tbsp", label: "tablespoon (15 mL)", kind: "ml", basePerMeasure: 15 },
+    ],
+    },
+
+    {
+    id: "starbucks_brewed_coffee_black_unsweet",
+    name: "Starbucks - Black Unsweetened Brewed Coffee (label-based)",
+    baseUnit: "ml",
+    // Label: 12 fl oz (360mL) = 15 kcal, 1P, 0F, 3C
+    perBaseUnit: {
+        kcal: 15 / 360,
+        protein: 1 / 360,
+        fat: 0 / 360,
+        carbs: 3 / 360,
+    },
+    measures: [
+        { id: "ml",     label: "milliliters (ml)", kind: "ml", basePerMeasure: 1 },
+        { id: "fl_oz",  label: "1 fl oz (~30 mL)", kind: "ml", basePerMeasure: 30 },
+        { id: "serving_12oz", label: "12 fl oz (360 mL)", kind: "ml", basePerMeasure: 360 },
+        { id: "cup_8oz", label: "8 fl oz (~240 mL)", kind: "ml", basePerMeasure: 240 },
+    ],
     }
+
 ];
 
 // Tip for nutrition labels:
