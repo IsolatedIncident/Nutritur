@@ -20,6 +20,9 @@
   const pProtein   = document.getElementById("pProtein");
   const pFat       = document.getElementById("pFat");
   const pCarbs     = document.getElementById("pCarbs");
+  const pProteinRatio = document.getElementById("pProteinRatio");
+  const pFatRatio = document.getElementById("pFatRatio");
+  const pCarbRatio = document.getElementById("pCarbRatio");
   const perUnitHint= document.getElementById("perUnitHint");
 
   const logBody  = document.getElementById("logBody");
@@ -27,6 +30,9 @@
   const tProtein = document.getElementById("tProtein");
   const tFat     = document.getElementById("tFat");
   const tCarbs   = document.getElementById("tCarbs");
+  const tProteinRatio = document.getElementById("tProteinRatio");
+  const tFatRatio = document.getElementById("tFatRatio");
+  const tCarbsRatio = document.getElementById("tCarbsRatio");
 
   // ---------- Storage ----------
     const STORAGE_HISTORY = "history_v1";
@@ -224,10 +230,10 @@
     if (!food || !measure) return null;
 
     const amount = Number(amountInput.value);
-    if (!Number.isFinite(amount) || amount <= 0) {
-      previewBox.classList.add("hidden");
-      return null;
-    }
+    // if (!Number.isFinite(amount) || amount <= 0) {
+    //   previewBox.classList.add("hidden");
+    //   return null;
+    // }
 
     const per = getPerBase(food);
     const baseUnit = getBaseUnit(food);
@@ -238,13 +244,36 @@
       protein: baseAmount * (per.protein ?? 0),
       fat: baseAmount * (per.fat ?? 0),
       carbs: baseAmount * (per.carbs ?? 0),
+      pRatio: 0,
+      fRatio: 0,
+      cRatio: 0,
     };
 
     pKcal.textContent = fmt0(totals.kcal);
     pProtein.textContent = fmt1(totals.protein);
     pFat.textContent = fmt1(totals.fat);
     pCarbs.textContent = fmt1(totals.carbs);
+    const p = Number(totals.protein) || 0;
+    const c = Number(totals.carbs) || 0;
+    const f = Number(totals.fat) || 0;
 
+    const pCal = p * 4;
+    const cCal = c * 4;
+    const fCal = f * 9;
+    const total = pCal + cCal + fCal;
+
+    if (total <= 0) {
+        pProteinRatio.textContent = fmt1(0)+"%";
+        pFatRatio.textContent = fmt1(0)+"%";
+        pCarbRatio.textContent = fmt1(0)+"%";
+    }
+
+    totals.pRatio = round((pCal / total)*100, 2);
+    totals.fRatio = round((fCal / total)*100, 2); 
+    totals.cRatio = round((cCal / total)*100, 2); 
+    pProteinRatio.textContent = totals.pRatio +"%";
+    pFatRatio.textContent     = totals.fRatio +"%";
+    pCarbRatio.textContent    = totals.cRatio +"%";
     perUnitHint.textContent =
       `Per 1 ${baseUnit}: ${per.kcal} kcal, ${per.protein}P, ${per.fat}F, ${per.carbs}C. ` +
       `(${fmt1(baseAmount)} ${baseUnit} total)`;
@@ -296,7 +325,7 @@
 
     saveToDailyIntake(STORAGE_TALLY, dailyIntake);
     clearEntry();
-    amountInput.value = 0;
+    amountInput.value = "";
     renderLog();
     renderTotals();
   }
@@ -317,7 +346,15 @@
 
   function clearEntry() {
     amountInput.value = "";
-    previewBox.classList.add("hidden");
+    pKcal.textContent = "0";
+    pProtein.textContent = "0";
+    pFat.textContent = "0";
+    pCarbs.textContent = "0";
+    pProteinRatio.textContent = "0%"
+    pFatRatio.textContent     = "0%"
+    pCarbRatio.textContent    = "0%"
+  
+    perUnitHint.textContent = "";
     amountInput.focus();
   }
 
@@ -327,8 +364,23 @@
       acc.protein += e.totals.protein;
       acc.fat += e.totals.fat;
       acc.carbs += e.totals.carbs;
+      const pCal = acc.protein * 4;
+      const cCal = acc.carbs * 4;
+      const fCal = acc.fat * 9;
+      const total = pCal + cCal + fCal;
+      acc.pRatio = round((pCal / total)*100, 2);
+      acc.cRatio = round((cCal / total)*100, 2);
+      acc.fRatio = round((fCal / total)*100, 2);
       return acc;
-    }, { kcal: 0, protein: 0, fat: 0, carbs: 0 });
+    }, { 
+        kcal: 0, 
+        protein: 0, 
+        fat: 0, 
+        carbs: 0,
+        pRatio: 0,
+        cRatio: 0,
+        fRatio: 0
+    });
   }
 
   function renderLog() {
@@ -381,6 +433,9 @@
     tProtein.textContent = fmt1(totals.protein);
     tFat.textContent = fmt1(totals.fat);
     tCarbs.textContent = fmt1(totals.carbs);
+    tProteinRatio.textContent = fmt1(totals.pRatio)+"%";
+    tFatRatio.textContent = fmt1(totals.fRatio)+"%";
+    tCarbsRatio.textContent = fmt1(totals.cRatio)+"%";
   }
 
   // ---------- History: save day + weight ----------

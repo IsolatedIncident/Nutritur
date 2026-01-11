@@ -45,17 +45,17 @@
     </div><div class="actions">
       <button id="addBtn">Add to Today’s Intake</button>
       
-    </div><div></div></div><div id="preview" class="result hidden">
+    </div><div></div></div><div id="preview" class="result">
       <h2>This Entry</h2>
       <table>
         <tbody>
-          <tr><td>Calories</td><td><strong id="pKcal">44</strong> kcal</td></tr>
-          <tr><td>Protein</td><td><strong id="pProtein">2.3</strong> g</td></tr>
-          <tr><td>Fat</td><td><strong id="pFat">2.3</strong> g</td></tr>
-          <tr><td>Carbs</td><td><strong id="pCarbs">3.5</strong> g</td></tr>
+          <tr><td>Calories</td><td><strong id="pKcal">0</strong> kcal</td></tr>
+          <tr><td>Protein</td><td><strong id="pProtein">0</strong> g</td><td id="pProteinRatio">0%</td></tr>
+          <tr><td>Fat</td><td><strong id="pFat">0</strong> g</td><td id="pFatRatio">0%</td></tr>
+          <tr><td>Carbs</td><td><strong id="pCarbs">0</strong> g</td><td id="pCarbRatio">0%</td></tr>
         </tbody>
       </table>
-      <div class="hint" id="perUnitHint">Per 1 ml: 0.625 kcal, 0.033333P, 0.033333F, 0.05C. (70.0 ml total)</div>
+      <div class="hint" id="perUnitHint"></div>
     </div></div>
     
 
@@ -89,6 +89,17 @@
               <td class="num"><strong id="tProtein">0.0</strong></td>
               <td class="num"><strong id="tFat">0.0</strong></td>
               <td class="num"><strong id="tCarbs">0.0</strong></td>
+              <td></td>
+            </tr>
+          </tfoot>
+          <tfoot>
+            <tr>
+              <td><strong>Ratios</strong></td>
+              <td></td>
+              <td class="num" id="tKcalRatio"></td>
+              <td class="num" id="tProteinRatio">0%</td>
+              <td class="num" id="tFatRatio">0%</td>
+              <td class="num" id="tCarbsRatio">0%</td>
               <td></td>
             </tr>
           </tfoot>
