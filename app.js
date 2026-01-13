@@ -41,7 +41,6 @@
     const saveDayDate  = document.getElementById("saveDayDate");
     const saveDayMsg   = document.getElementById("saveDayMsg");
 
-    const weightDate   = document.getElementById("weightDate");
     const weightInput  = document.getElementById("weightInput");
     const saveWeightMsg= document.getElementById("saveWeightMsg");
 
@@ -228,10 +227,6 @@
     if (!food || !measure) return null;
 
     const amount = Number(amountInput.value);
-    // if (!Number.isFinite(amount) || amount <= 0) {
-    //   previewBox.classList.add("hidden");
-    //   return null;
-    // }
 
     const per = getPerBase(food);
     const baseUnit = getBaseUnit(food);
