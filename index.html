@@ -15,24 +15,25 @@
 </head>
 <body>
 
+
   <div class="chartSection">
     <div class="chartHeader">
         
         <div class="row"><div class="rangeControls">
-        <div class="row inline">
+        
+        
+        
+        <div><div class="row inline">
             <label for="historyStart">Start</label>
             <input id="historyStart" type="date">
-        </div>
-        <div class="row inline">
+        </div><div class="row inline">
             <label for="historyEnd">End</label>
             <input id="historyEnd" type="date">
-        </div>
-        <button id="historyRangeApply" class="secondary small">Apply</button>
-        </div></div><input id="importHistoryFile" type="file" accept="application/json,.json" text="Import"><button id="exportHistoryBtn">Download History</button>
+        </div></div><button id="historyRangeApply" class="secondary small">Apply</button></div></div><div class="historyFile"><input id="importHistoryFile" type="file" accept="application/json,.json" text="Import"><button id="exportHistoryBtn">Download History</button></div>
     </div>
 
     <div class="canvasWrap">
-        <canvas id="historyChart" style="display: block; box-sizing: border-box; height: 358px; width: 1815px;" width="1815" height="358"></canvas>
+        <canvas id="historyChart" style="display: block; box-sizing: border-box; height: 358px; width: 340px;" width="340" height="358"></canvas>
     </div>
     </div><!-- MACRO CALCULATOR CARD -->
   
@@ -40,9 +41,9 @@
   <div class="card">
     <h1>Macro Calculator</h1>
 
-    <div class="panel"><div class="panel" style="display: grid;flex: 1;"><div class="row">
+    <div class="panel"><div class="panel" style="/*! display: grid; */flex: 1;"><div class="row">
       <label for="foodSelect">Food</label>
-      <select id="foodSelect"><option value="whey_protein_powder">Whey Protein Powder (label-based)</option><option value="mailhots_sausage">Mailhot's Best Sausage (label-based)</option><option value="whole_milk_hood">Whole Milk (Hood, label-based)</option><option value="mission_carb_balance_tortilla">Mission Carb Balance Tortilla (flour)</option><option value="ground_turkey">Ground Turkey (label-based)</option><option value="chicken_breast">Chicken Breast (boneless/skinless, label-based)</option><option value="egg_whole">Egg (whole, label-based)</option><option value="ballpark_burger_bun">Ball Park Burger Bun</option><option value="sweet_baby_rays_garlic_buffalo">Sweet Baby Ray's Garlic Buffalo</option><option value="hannaford_ketchup">Ketchup (Hannaford / label-based)</option><option value="hellmanns_light_mayo">Hellmann's Light Mayonnaise</option><option value="amys_soup_southwestern_fire_roasted_veg">Amy's Soup - Southwestern Fire Roasted Veg (label-based)</option><option value="amys_soup_rustic_italian_vegetable">Amy's Soup - Rustic Italian Vegetable (label-based)</option><option value="amys_soup_chunky_vegetable">Amy's Soup - Chunky Vegetable (label-based)</option><option value="oakhurst_vitamin_d_milk">Milk - Oakhurst Vitamin D (label-based)</option><option value="starbucks_brewed_coffee_black_unsweet">Starbucks - Black Unsweetened Brewed Coffee (label-based)</option></select>
+      <select id="foodSelect"><option value="whey_protein_powder">Whey Protein Powder (label-based)</option><option value="mailhots_sausage">Mailhot's Best Sausage (label-based)</option><option value="whole_milk_hood">Whole Milk (Hood, label-based)</option><option value="mission_carb_balance_tortilla">Mission Carb Balance Tortilla (flour)</option><option value="ground_turkey">Ground Turkey (label-based)</option><option value="chicken_breast">Chicken Breast (boneless/skinless, label-based)</option><option value="egg_whole">Egg (whole, label-based)</option><option value="ballpark_burger_bun">Ball Park Burger Bun</option><option value="sweet_baby_rays_garlic_buffalo">Sweet Baby Ray's Garlic Buffalo</option><option value="hannaford_ketchup">Ketchup (Hannaford / label-based)</option><option value="hellmanns_light_mayo">Hellmann's Light Mayonnaise</option><option value="amys_soup_southwestern_fire_roasted_veg">Amy's Soup - Southwestern Fire Roasted Veg (label-based)</option><option value="amys_soup_rustic_italian_vegetable">Amy's Soup - Rustic Italian Vegetable (label-based)</option><option value="amys_soup_chunky_vegetable">Amy's Soup - Chunky Vegetable (label-based)</option><option value="oakhurst_vitamin_d_milk">Milk - Oakhurst Vitamin D (label-based)</option><option value="starbucks_brewed_coffee_black_unsweet">Starbucks - Black Unsweetened Brewed Coffee (label-based)</option><option value="jj_nissen_white_bread">J.J. Nissen White Bread (label-based)</option><option value="italian_protein_soup_label_based">Italian Protein Soup (label-based)</option></select>
     </div><div class="row">
       <label for="measureSelect">Measure</label>
       <select id="measureSelect"><option value="base">grams (g)</option></select>
@@ -57,12 +58,12 @@
       <table>
         <tbody>
           <tr><td>Calories</td><td><strong id="pKcal">0</strong> kcal</td></tr>
-          <tr><td>Protein</td><td><strong id="pProtein">0.0</strong> g</td><td id="pProteinRatio">0%</td></tr>
-          <tr><td>Fat</td><td><strong id="pFat">0.0</strong> g</td><td id="pFatRatio">0%</td></tr>
-          <tr><td>Carbs</td><td><strong id="pCarbs">0.0</strong> g</td><td id="pCarbRatio">0%</td></tr>
+          <tr><td>Protein</td><td><strong id="pProtein">0</strong> g</td><td id="pProteinRatio">0%</td></tr>
+          <tr><td>Fat</td><td><strong id="pFat">0</strong> g</td><td id="pFatRatio">0%</td></tr>
+          <tr><td>Carbs</td><td><strong id="pCarbs">0</strong> g</td><td id="pCarbRatio">0%</td></tr>
         </tbody>
       </table>
-      <div class="hint" id="perUnitHint">Per 1 g: 3.870968 kcal, 0.774194P, 0.048387F, 0.129032C. (0.0 g total)</div>
+      <div class="hint" id="perUnitHint"></div>
     </div></div>
     
 
@@ -82,70 +83,20 @@
               <th class="num">P</th>
               <th class="num">F</th>
               <th class="num">C</th>
-              <th style="text-align: right;"><button id="clearLogBtn" class="secondary small">Clear Intake</button></th>
+              <th style="text-align: right;"></th>
             </tr>
           </thead>
-          <tbody id="logBody"><tr>
-        <td>
-          <div><strong>Mailhot's Best Sausage (label-based)</strong></div>
-          <div style="color: var(--muted); font-size: 12px;">grams (g)</div>
-        </td>
-        <td class="num">66.0</td>
-        <td class="num">167</td>
-        <td class="num">10.7</td>
-        <td class="num">12.7</td>
-        <td class="num">2.0</td>
-        <td class="num">
-          <button class="iconBtn" data-remove="1768152569664-38df86b8a5e4f8" title="Remove">×</button>
-        </td>
-      </tr><tr>
-        <td>
-          <div><strong>Whey Protein Powder (label-based)</strong></div>
-          <div style="color: var(--muted); font-size: 12px;">grams (g)</div>
-        </td>
-        <td class="num">34.0</td>
-        <td class="num">132</td>
-        <td class="num">26.3</td>
-        <td class="num">1.6</td>
-        <td class="num">4.4</td>
-        <td class="num">
-          <button class="iconBtn" data-remove="1768154234652-efa40ddde50018" title="Remove">×</button>
-        </td>
-      </tr><tr>
-        <td>
-          <div><strong>Starbucks - Black Unsweetened Brewed Coffee (label-based)</strong></div>
-          <div style="color: var(--muted); font-size: 12px;">milliliters (ml)</div>
-        </td>
-        <td class="num">237.0</td>
-        <td class="num">10</td>
-        <td class="num">0.7</td>
-        <td class="num">0.0</td>
-        <td class="num">2.0</td>
-        <td class="num">
-          <button class="iconBtn" data-remove="1768155212517-3f6edbd5c95628" title="Remove">×</button>
-        </td>
-      </tr><tr>
-        <td>
-          <div><strong>Milk - Oakhurst Vitamin D (label-based)</strong></div>
-          <div style="color: var(--muted); font-size: 12px;">milliliters (ml)</div>
-        </td>
-        <td class="num">206.0</td>
-        <td class="num">131</td>
-        <td class="num">7.0</td>
-        <td class="num">7.0</td>
-        <td class="num">10.5</td>
-        <td class="num">
-          <button class="iconBtn" data-remove="1768155223201-c46f7dfd629c58" title="Remove">×</button>
-        </td>
-      </tr></tbody>
+          <tbody id="logBody"><tr><td colspan="7" style="color: var(--muted); padding: 14px 10px;">
+        No items yet — add something above.
+      </td></tr></tbody>
           <tfoot>
             <tr>
               <td><strong>Total</strong></td>
               <td></td>
-              <td class="num"><strong id="tKcal">439</strong></td>
-              <td class="num"><strong id="tProtein">44.6</strong></td>
-              <td class="num"><strong id="tFat">21.3</strong></td>
-              <td class="num"><strong id="tCarbs">18.8</strong></td>
+              <td class="num"><strong id="tKcal">0</strong></td>
+              <td class="num"><strong id="tProtein">0.0</strong></td>
+              <td class="num"><strong id="tFat">0.0</strong></td>
+              <td class="num"><strong id="tCarbs">0.0</strong></td>
               <td></td>
             </tr>
           </tfoot>
@@ -154,9 +105,9 @@
               <td><strong>Ratios</strong></td>
               <td></td>
               <td class="num" id="tKcalRatio"></td>
-              <td class="num" id="tProteinRatio">40.1%</td>
-              <td class="num" id="tFatRatio">43.0%</td>
-              <td class="num" id="tCarbsRatio">16.9%</td>
+              <td class="num" id="tProteinRatio">0.0%</td>
+              <td class="num" id="tFatRatio">0.0%</td>
+              <td class="num" id="tCarbsRatio">0.0%</td>
               <td></td>
             </tr>
           </tfoot>
@@ -164,7 +115,7 @@
       </div>
 
       
-    </div>
+    <button id="clearLogBtn" class="secondary small">Clear Intake</button></div>
 
     <div class="panel">
         
@@ -183,5 +134,8 @@
     navigator.serviceWorker.register("service-worker.js");
   }
   </script>
+
+
+
 </body>
 </html>
