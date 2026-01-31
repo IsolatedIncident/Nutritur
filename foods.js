@@ -256,7 +256,73 @@ window.FOODS = [
         { id: "serving_12oz", label: "12 fl oz (360 mL)", kind: "ml", basePerMeasure: 360 },
         { id: "cup_8oz", label: "8 fl oz (~240 mL)", kind: "ml", basePerMeasure: 240 },
     ],
-    }
+    },
+    {
+  id: "jj_nissen_white_bread",
+  name: "J.J. Nissen White Bread (label-based)",
+  baseUnit: "g",
+
+  // Label: 1 slice (39g)
+  // Calories 110, Protein 3g, Fat 2g, Carbs 19g
+  perBaseUnit: {
+    kcal: 110 / 39,
+    protein: 3 / 39,
+    fat: 2 / 39,
+    carbs: 19 / 39,
+  },
+
+  measures: [
+    {
+      id: "g",
+      label: "grams (g)",
+      kind: "g",
+      basePerMeasure: 1,
+    },
+    {
+      id: "slice",
+      label: "1 slice (39 g)",
+      kind: "g",
+      basePerMeasure: 39,
+    },
+  ],
+},
+{
+  id: "italian_protein_soup_label_based",
+  name: "Italian Protein Soup (label-based)",
+  baseUnit: "g",
+
+  // Label per 1 cup (245 g):
+  // Calories 140, Protein 8g, Fat 1.5g, Carbs 24g
+  perBaseUnit: {
+    kcal: 140 / 245,
+    protein: 8 / 245,
+    fat: 1.5 / 245,
+    carbs: 24 / 245,
+  },
+
+  measures: [
+    {
+      id: "g",
+      label: "grams (g)",
+      kind: "g",
+      basePerMeasure: 1,
+    },
+    {
+      id: "cup",
+      label: "1 cup (245 g)",
+      kind: "g",
+      basePerMeasure: 245,
+    },
+    {
+      id: "can",
+      label: "1 can (~490 g)",
+      kind: "g",
+      basePerMeasure: 490,
+    },
+  ],
+}
+
+
 
 ];
 
