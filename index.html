@@ -6,6 +6,11 @@
   <title>Macros + History</title>
   <link rel="stylesheet" href="./styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Food">
+
 </head>
 <body>
 
@@ -171,8 +176,11 @@
   </div><script src="./foods.js"></script>
   <!-- Chart.js from node_modules (UMD build) -->
   <!-- <script src="./node_modules/chart.js/dist/chart.umd.js"></script> -->
-  
-
   <script src="./app.js"></script>
+  <script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js");
+  }
+  </script>
 </body>
 </html>
