@@ -59,7 +59,7 @@
     const weightInput  = document.getElementById("weightInput");
     const saveWeightMsg= document.getElementById("saveWeightMsg");
 
-    const exportHistoryBtn  = document.getElementById("exportHistoryBtn");
+    const exportDataBtn  = document.getElementById("exportDataBtn");
     const importHistoryFile = document.getElementById("importHistoryFile");
 
     const historyStart = document.getElementById("historyStart");
@@ -705,10 +705,15 @@
     redrawHistoryChart();
     }
 
+  function downloadData() {
+    downloadJSON('history.json', history)
+    downloadJSON('foods.json', foods)
+  }
+
 
   // ---------- Import JSON ----------
 
-  exportHistoryBtn.addEventListener("click", () => downloadJSON("history.json", history));
+  exportDataBtn.addEventListener("click", () => downloadData());
 
   importHistoryFile.addEventListener("change", async (ev) => {
     const file = ev.target.files?.[0];

@@ -1,0 +1,5 @@
+Change the way food ids work, so adding same name foods wont conflict 
+
+add ability to edit food data
+
+improve ui
