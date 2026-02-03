@@ -1,9 +1,8 @@
 // app.js
 (function () {
-  const foods = Array.isArray(window.FOODS) ? window.FOODS : [];
-
   // ---------- Storage keys ----------
   const STORAGE_TALLY  = "macro_tally_v2";
+  const STORAGE_FOOD_DATA = "food_data_v1"
 
   // ---------- Calculator DOM ----------
   const foodSelect    = document.getElementById("foodSelect");
@@ -33,6 +32,22 @@
   const tFatRatio = document.getElementById("tFatRatio");
   const tCarbsRatio = document.getElementById("tCarbsRatio");
 
+  // new food creation dom 
+  const openfoodEditorBtn = document.getElementById("openFoodEditorBtn");
+  const foodModal = document.getElementById("foodModal");
+  const foodModalBackdrop = document.getElementById("foodModalBackdrop");
+  const closeFoodModalBtn = document.getElementById("closeFoodModalBtn");
+  const saveFoodModalBtn = document.getElementById("saveFoodModalBtn");
+  const foodForm = document.getElementById("foodForm");
+  const newFoodName = document.getElementById("newFoodName");
+  const newFoodBaseUnit = document.getElementById("newFoodBaseUnit");
+  const newFoodServingSize = document.getElementById("newFoodServingSize");
+  const newFoodCals = document.getElementById("newFoodCals");
+  const newFoodProtein = document.getElementById("newFoodProtein");
+  const newFoodFat = document.getElementById("newFoodFat");
+  const newFoodCarbs = document.getElementById("newFoodCarbs");
+  
+  
   // ---------- Storage ----------
     const STORAGE_HISTORY = "history_v1";
 
@@ -54,8 +69,9 @@
     const historyCanvas = document.getElementById("historyChart");
 
     // ---------- State ----------
-    let history = loadJSON_any(STORAGE_HISTORY, []);  // array of entries
-    let dailyIntake = loadJSON_any(STORAGE_TALLY, []);
+    let history = loadJsonFromLocalStorage(STORAGE_HISTORY, []);  // array of entries
+    let dailyIntake = loadJsonFromLocalStorage(STORAGE_TALLY, []);
+    let foods = loadJsonFromLocalStorage(STORAGE_FOOD_DATA, []);
 
   // ---------- Utils ----------
   function todayISO() {
@@ -94,22 +110,19 @@
 
   function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
 
-  function loadJSON_any(key, fallback) {
+  function loadJsonFromLocalStorage(key, fallback) {
+    
     try {
         const raw = localStorage.getItem(key);
-        if (!raw) return fallback;
+        if (!raw) { return fallback;}
         const parsed = JSON.parse(raw);
         return Array.isArray(parsed) ? parsed : fallback;
     } catch { return fallback; }
     }
-  function saveJSON_any(key, value) {
+  function saveJsonToLocalStorage(key, value) {
     try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
     }
 
-
-  function saveToDailyIntake(key, value) {
-    try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
-  }
 
   function downloadJSON(filename, data) {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
@@ -127,11 +140,55 @@
     const p = Math.pow(10, decimals);
     return Math.round((Number(n) || 0) * p) / p;
     }
+  function slugifyId(name) {
+  return String(name || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
 
   // ---------- Food / measure helpers ----------
+  function makeFoodFromLabel({ name, baseUnit, servingSize, kcal, protein, fat, carbs }) {
+    const s = Number(servingSize);
+    
+    const id = slugifyId(name);
+    
+    const perBaseUnit = {
+      kcal: Number(kcal) / s,
+      protein: Number(protein) /s,
+      fat: Number(fat) / s,
+      carbs: Number(carbs) /s
+    };
+
+    return {
+      id, 
+      name: String(name).trim(),
+      baseUnit,
+      perBaseUnit,
+      measures: [
+        {
+          id: "base",
+          label: baseUnit === "ml" ? "milliliters (ml)" : "grams (g)",
+          kind: baseUnit,
+          basePerMeasure: 1
+        },
+        {
+          id: "serving",
+          label: "1 serving",
+          kind: baseUnit,
+          basePerMeasure: s
+        }
+      ]
+    }
+  }
   function getSelectedFood() {
     const id = foodSelect.value;
     return foods.find(f => f.id === id) || foods[0] || null;
+  }
+
+  function getFood(foodName) {
+    return foods.find(f => f.name === foodName) || foods[0] || null;
   }
 
   function getPerBase(food) {
@@ -219,18 +276,106 @@
     }
   }
 
+  // food creation modal buttons
+  function openFoodModal() {
+    foodModal.classList.remove("hidden");
+    foodModalBackdrop.classList.remove("hidden");
+    newFoodName.focus();
+  }
+
+  function closeFoodModal() {
+    foodModal.classList.add("hidden");
+    foodModalBackdrop.classList.add("hidden");
+  }
+
+  function resetFoodModal() {
+    newFoodCals.value = "";
+    newFoodFat.value = "";
+    newFoodCarbs.value = "";
+    newFoodServingSize.value = "";
+    newFoodProtein.value = "";
+    newFoodName.value = "";
+    newFoodBaseUnit.value = "";
+  }
+
+  function saveFood(){const food = makeFoodFromLabel({
+        name: newFoodName.value,
+        baseUnit: newFoodBaseUnit.value,
+        servingSize: newFoodServingSize.value,
+        kcal: newFoodCals.value,
+        protein: newFoodProtein.value,
+        fat: newFoodFat.value,
+        carbs: newFoodCarbs.value
+      });
+
+      food.perBaseUnit.kcal = round(food.perBaseUnit.kcal, 6);
+      food.perBaseUnit.protein = round(food.perBaseUnit.protein, 6);
+      food.perBaseUnit.fat = round(food.perBaseUnit.fat, 6);
+      food.perBaseUnit.carbs = round(food.perBaseUnit.carbs, 6);
+
+      foods.push(food);
+
+      saveJsonToLocalStorage(STORAGE_FOOD_DATA, foods);
+
+      populateFoods();
+      
+      foodSelect.value = food.id;
+      populateMeasures();
+      updateUnitUI();
+      resetFoodModal();
+      closeFoodModal();
+    };
+
+  
+
+  foodForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    try {
+      const food = makeFoodFromLabel({
+        name: newFoodName.value,
+        baseUnit: newFoodBaseUnit.value,
+        servingSize: newFoodServingSize.value,
+        kcal: newFoodCals.value,
+        protein: newFoodProtein.value,
+        fat: newFoodFat.value,
+        carbs: newFoodCarbs.value
+      });
+
+      food.perBaseUnit.kcal = round(food.perBaseUnit.kcal, 6);
+      food.perBaseUnit.protein = round(food.perBaseUnit.protein, 6);
+      food.perBaseUnit.fat = round(food.perBaseUnit.fat, 6);
+      food.perBaseUnit.carbs = round(food.perBaseUnit.carbs, 6);
+
+      foods.push(food);
+
+      saveJsonToLocalStorage(STORAGE_FOOD_DATA, foods);
+
+      populateFoods();
+      
+      foodSelect.value = food.id;
+      populateMeasures();
+      updateUnitUI();
+      closeFoodModal();
+    } catch(err) {
+      console.log("error savuing food")
+    }
+  });
+
 
   // ---------- Calculator logic ----------
   function computeEntryPreview() {
     const food = getSelectedFood();
     const measure = getSelectedMeasure();
+    const baseMeasure = measure.basePerMeasure;
+
     if (!food || !measure) return null;
 
     const amount = Number(amountInput.value);
 
     const per = getPerBase(food);
     const baseUnit = getBaseUnit(food);
-    const baseAmount = amount * (measure.basePerMeasure ?? 1);
+    const baseAmount = amount * baseMeasure;
 
     const totals = {
       kcal: baseAmount * (per.kcal ?? 0),
@@ -278,8 +423,49 @@
       foodName: food.name,
       measureId: measure.id,
       measureLabel: measure.label,
+      amount: baseAmount,
+      measure: baseMeasure,
+      totals
+    };
+  }
+
+  function computeFoodEntry(foodName, amount) {
+    const food = getFood(foodName);
+    const per = getPerBase(food);
+    const measure = getMeasures(food);
+    const totals = {
+      kcal: amount * (per.kcal ?? 0),
+      protein: amount * (per.protein ?? 0),
+      fat: amount * (per.fat ?? 0),
+      carbs: amount * (per.carbs ?? 0),
+      pRatio: 0,
+      fRatio: 0,
+      cRatio: 0,
+    };
+
+    pKcal.textContent = fmt0(totals.kcal);
+    pProtein.textContent = fmt1(totals.protein);
+    pFat.textContent = fmt1(totals.fat);
+    pCarbs.textContent = fmt1(totals.carbs);
+    const p = Number(totals.protein) || 0;
+    const c = Number(totals.carbs) || 0;
+    const f = Number(totals.fat) || 0;
+
+    const pCal = p * 4;
+    const cCal = c * 4;
+    const fCal = f * 9;
+    const total = pCal + cCal + fCal;
+
+    totals.pRatio = round((pCal / total)*100, 2);
+    totals.fRatio = round((fCal / total)*100, 2); 
+    totals.cRatio = round((cCal / total)*100, 2); 
+
+    return {
+      foodId: food.id,
+      foodName: food.name,
+      measureId: measure[0].id,
+      measureLabel: measure[0].label,
       amount,
-      baseAmount,
       totals
     };
   }
@@ -316,23 +502,36 @@
       ...entry
     });
 
-    saveToDailyIntake(STORAGE_TALLY, dailyIntake);
+    saveJsonToLocalStorage(STORAGE_TALLY, dailyIntake);
     clearEntry();
     amountInput.value = "";
     renderLog();
     renderTotals();
+    saveDay();
+  }
+
+  function addEntryToLog(entry) {
+    if (!entry) return;
+
+    dailyIntake.push({
+      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      ...entry
+    });
+
+    saveJsonToLocalStorage(STORAGE_TALLY, dailyIntake);
   }
 
   function removeFromLog(id) {
     dailyIntake = dailyIntake.filter(e => e.id !== id);
-    saveToDailyIntake(STORAGE_TALLY, dailyIntake);
+    saveJsonToLocalStorage(STORAGE_TALLY, dailyIntake);
     renderLog();
     renderTotals();
+    saveDay();
   }
 
   function clearLog() {
     dailyIntake = [];
-    saveToDailyIntake(STORAGE_TALLY, dailyIntake);
+    saveJsonToLocalStorage(STORAGE_TALLY, dailyIntake);
     renderLog();
     renderTotals();
   }
@@ -388,9 +587,10 @@
       return;
     }
 
+    
+
     for (const e of dailyIntake) {
       const tr = document.createElement("tr");
-
       // show amount as int if it's a "count-ish" measure
       const isCount = !(e.measureLabel.includes("(g)") || e.measureLabel.includes("(ml)") || e.measureId === "g" || e.measureId === "ml" || e.measureId === "base");
       const amountText = isCount ? fmt0(e.amount) : fmt1(e.amount);
@@ -440,6 +640,38 @@
     return arr;
   }
 
+  function loadDay() {
+    dailyIntake = [];
+    saveJsonToLocalStorage(STORAGE_TALLY, dailyIntake);
+    const date = saveDayDate.value || todayISO();
+    const existing = history.find(e => e.date === date) || { date };
+    if (existing.intake) {
+      for (i = 0; i<existing.intake.length; i++){
+        const food = existing.intake[i];
+        const foodName = food.name;
+        const foodAmount = food.amount;
+        const entry = computeFoodEntry(foodName, foodAmount);
+        computeRatios(entry);
+        addEntryToLog(entry);
+      }
+    }
+    renderLog();
+    renderTotals();
+  }
+
+  function convertDailyIntake() {
+    let conversion = [];
+    for (i = 0; i < dailyIntake.length; i++){
+      const entry = dailyIntake[i];
+     
+      let newEntry = {};
+      newEntry.name = entry.foodName;
+      newEntry.amount = entry.amount;
+      conversion.push(newEntry);
+    }
+    return conversion;
+  }
+
   function saveDay() {
     const date = saveDayDate.value || todayISO();
     const totals = currentTallyTotals();
@@ -458,11 +690,13 @@
     existing.fat      = round(totals.fat || 0, 1);
     existing.carbs    = round(totals.carbs || 0, 1);
     existing.weight   = round(w, 1);
+    existing.intake   = convertDailyIntake();
+
 
     computeRatios(existing);
 
     history = upsertByDate(history, existing);
-    saveJSON_any(STORAGE_HISTORY, history);
+    saveJsonToLocalStorage(STORAGE_HISTORY, history);
 
     // downloadJSON("history.json", history);
     saveDayMsg.textContent = `Saved ${date}`;
@@ -516,7 +750,7 @@
         })
         .sort((a, b) => a.date.localeCompare(b.date));
 
-        saveJSON_any(STORAGE_HISTORY, history);
+        saveJsonToLocalStorage(STORAGE_HISTORY, history);
         setDefaultHistoryRange();
         redrawHistoryChart();
     } catch (err) {
@@ -659,6 +893,15 @@
 
   saveDayBtn.addEventListener("click", () => saveDay());
 
+  openfoodEditorBtn?.addEventListener("click", () => openFoodModal());
+  closeFoodModalBtn?.addEventListener("click", () => closeFoodModal());
+  saveFoodModalBtn?.addEventListener("click", () => saveFood())
+  foodModalBackdrop?.addEventListener("click", () => closeFoodModal());
+
+  weightInput.addEventListener("change", saveDay)
+
+  saveDayDate.addEventListener("change", loadDay)
+
   // ---------- Init ----------
   populateFoods();
   populateMeasures();
@@ -668,6 +911,7 @@
   renderTotals();
 
   saveDayDate.value = todayISO();
+  loadDay();
 
   setDefaultHistoryRange();
   ensureHistoryChart();

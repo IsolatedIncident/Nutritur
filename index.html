@@ -36,17 +36,63 @@
         <canvas id="historyChart" style="display: block; box-sizing: border-box; height: 358px; width: 340px;" width="340" height="358"></canvas>
     </div>
     </div><!-- MACRO CALCULATOR CARD -->
-  
+  <button id="openFoodEditorBtn" type="button">Add new food</button>
+  <div id="foodModalBackdrop" class="modal-backdrop hidden"></div>
+  <div id="foodModal" class="modal hidden" role="dialog">
+    <div class="modal-header">
+      <h2>Add a New Food</h2>
+      <button id="closeFoodModalBtn" class="modal-close" type="button">Close</button>
+      <button id="saveFoodModalBtn" class="modal-save" type="button">Save</button>
+    </div>
+    <form id="foodForm" class="modal-body">
+      <label>
+        Name
+        <input id="newFoodName" type="text" required></input>
+      </label>
 
+      <label>
+        Base Unit
+        <select id="newFoodBaseUnit" required>
+          <option value="g">grams</option>
+          <option value="ml">milliliters</option>
+        </select>
+      </label>
+
+      <label>
+        Serving Size (in base unit)
+        <input id="newFoodServingSize" type="number" min="0.0001" step="0.01" required></input>
+      </label>
+
+      <label>
+        Calories per serving
+        <input id="newFoodCals" type="number" min="0" step="1" placeholder="e.g., 120" required />
+      </label>
+
+      <label>
+        Protein
+        <input id="newFoodProtein" type="number" min="0" step="0.1" required></input>
+      </label>
+
+      <label>
+        Fat
+        <input id="newFoodFat" type="number" min="0" step="0.1" required></input>
+      </label>
+
+      <label>
+        Carbs
+        <input id="newFoodCarbs" type="number" min="0" step="0.1" required></input>
+      </label>
+    </form>
+  </div>
   <div class="card">
     <h1>Macro Calculator</h1>
 
     <div class="panel"><div class="panel" style="/*! display: grid; */flex: 1;"><div class="row">
       <label for="foodSelect">Food</label>
-      <select id="foodSelect"><option value="whey_protein_powder">Whey Protein Powder (label-based)</option><option value="mailhots_sausage">Mailhot's Best Sausage (label-based)</option><option value="whole_milk_hood">Whole Milk (Hood, label-based)</option><option value="mission_carb_balance_tortilla">Mission Carb Balance Tortilla (flour)</option><option value="ground_turkey">Ground Turkey (label-based)</option><option value="chicken_breast">Chicken Breast (boneless/skinless, label-based)</option><option value="egg_whole">Egg (whole, label-based)</option><option value="ballpark_burger_bun">Ball Park Burger Bun</option><option value="sweet_baby_rays_garlic_buffalo">Sweet Baby Ray's Garlic Buffalo</option><option value="hannaford_ketchup">Ketchup (Hannaford / label-based)</option><option value="hellmanns_light_mayo">Hellmann's Light Mayonnaise</option><option value="amys_soup_southwestern_fire_roasted_veg">Amy's Soup - Southwestern Fire Roasted Veg (label-based)</option><option value="amys_soup_rustic_italian_vegetable">Amy's Soup - Rustic Italian Vegetable (label-based)</option><option value="amys_soup_chunky_vegetable">Amy's Soup - Chunky Vegetable (label-based)</option><option value="oakhurst_vitamin_d_milk">Milk - Oakhurst Vitamin D (label-based)</option><option value="starbucks_brewed_coffee_black_unsweet">Starbucks - Black Unsweetened Brewed Coffee (label-based)</option><option value="jj_nissen_white_bread">J.J. Nissen White Bread (label-based)</option><option value="italian_protein_soup_label_based">Italian Protein Soup (label-based)</option></select>
+      <select id="foodSelect"></select>
     </div><div class="row">
       <label for="measureSelect">Measure</label>
-      <select id="measureSelect"><option value="base">grams (g)</option></select>
+      <select id="measureSelect"></select>
     </div><div class="row">
       <label for="amountInput">Amount (<span id="unitLabel">g</span>)</label>
       <input id="amountInput" type="number" inputmode="decimal" min="0" step="0.1" placeholder="Enter grams…">
@@ -69,7 +115,7 @@
 
     <div class="log">
       <div class="logHeader">
-        <h2>Today’s Intake</h2>
+        <h2>Intake</h2>
         
       </div>
 
@@ -129,11 +175,11 @@
   <!-- Chart.js from node_modules (UMD build) -->
   <!-- <script src="./node_modules/chart.js/dist/chart.umd.js"></script> -->
   <script src="./app.js"></script>
-  <script>
+  <!-- <script>
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("service-worker.js");
   }
-  </script>
+  </script> -->
 
 
 
