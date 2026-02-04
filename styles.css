@@ -295,4 +295,20 @@ canvas {
   font-size: 13px;
 }
 
+.file-btn {
+  display: inline-block;
+  background: #1e6cff;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  font-size: 14px;
+}
+
+.file-btn:hover {
+  background: #1557cc;
+}
+
+
 /* .canvasWrap { height: 360px; } */

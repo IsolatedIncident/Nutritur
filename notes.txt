@@ -3,3 +3,5 @@ Change the way food ids work, so adding same name foods wont conflict
 add ability to edit food data
 
 improve ui
+
+add saved meals, which you can eat a percentage o, which then gets added to the daily intake

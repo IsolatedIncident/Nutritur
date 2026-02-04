@@ -61,6 +61,7 @@
 
     const exportDataBtn  = document.getElementById("exportDataBtn");
     const importHistoryFile = document.getElementById("importHistoryFile");
+    const importFoodsFile = document.getElementById("importFoodsFile");
 
     const historyStart = document.getElementById("historyStart");
     const historyEnd   = document.getElementById("historyEnd");
@@ -715,6 +716,22 @@
 
   exportDataBtn.addEventListener("click", () => downloadData());
 
+  importFoodsFile.addEventListener("change", async (ev) => {
+    const file = ev.target.files?.[0];
+    console.log(file)
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      saveJsonToLocalStorage(STORAGE_FOOD_DATA, data);
+      foods = loadJsonFromLocalStorage(STORAGE_FOOD_DATA);
+      populateFoods();
+      populateMeasures();
+    } catch {
+      console.log('failed loading foods file');
+    }
+  })
+
   importHistoryFile.addEventListener("change", async (ev) => {
     const file = ev.target.files?.[0];
     if (!file) return;
@@ -876,7 +893,8 @@
     historyChart.update();
     }
 
-    historyRangeApply.addEventListener("click", () => redrawHistoryChart());
+    historyStart.addEventListener("change", () => redrawHistoryChart());
+    historyEnd.addEventListener("change", () => redrawHistoryChart());
     window.addEventListener("resize", () => redrawHistoryChart());
 
   // ---------- Events ----------

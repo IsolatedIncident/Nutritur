@@ -23,14 +23,24 @@
         
         
         
-        <div><div class="row inline">
-            <label for="historyStart">Start</label>
-            <input id="historyStart" type="date">
-        </div><div class="row inline">
-            <label for="historyEnd">End</label>
-            <input id="historyEnd" type="date">
-        </div></div><button id="historyRangeApply" class="secondary small">Apply</button></div></div><div class="historyFile"><input id="importHistoryFile" type="file" accept="application/json,.json" text="Import"><button id="exportDataBtn">Download Data</button></div>
-    </div>
+          <div>
+            <div class="row inline">
+              <label for="historyStart">Start</label>
+              <input id="historyStart" type="date">
+            </div>
+            <div class="row inline">
+              <label for="historyEnd">End</label>
+              <input id="historyEnd" type="date">
+            </div>
+          </div>
+          <div class="historyFile">
+            <label for="importHistoryFile" class="file-btn">Import History</label>
+            <input id="importHistoryFile" type="file" accept="application/json,.json" style="display: none;">
+            <label for="importFoodsFile" class="file-btn">Import Foods</label>
+            <input id="importFoodsFile" type="file" accept="application/json,.json" style="display: none;">
+            <button id="exportDataBtn">Download Data</button>
+          </div>
+        </div>
 
     <div class="canvasWrap">
         <canvas id="historyChart" style="display: block; box-sizing: border-box; height: 358px; width: 340px;" width="340" height="358"></canvas>
